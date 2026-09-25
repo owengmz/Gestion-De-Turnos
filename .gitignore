@@ -1,0 +1,18 @@
+# Carpetas de compilacion (se regeneran solas, nunca se editan a mano)
+bin/
+obj/
+
+# Archivos de configuracion local de Visual Studio
+.vs/
+*.user
+
+# Archivos de Rider / VS Code (si no los usa todo el equipo, opcional)
+.idea/
+
+# Secretos locales, nunca commitear
+.env
+appsettings.Development.json
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

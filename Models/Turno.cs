@@ -38,10 +38,14 @@ namespace mvc.Models
 
         [Column("usuario_creador_id")]
         public int usuario_creador_id { get; set; }
+        [ForeignKey("usuario_creador_id")]
+        public Usuario? UsuarioCreador { get; set; }
 
         [Column("usuario_modificador_id")]
         public int? usuario_modificador_id { get; set; }
-
+        [ForeignKey("usuario_modificador_id")]
+        public Usuario? UsuarioModificador { get; set; }        
+            
         [Column("fecha_creacion")]
         public DateTime fecha_creacion { get; set; }
 

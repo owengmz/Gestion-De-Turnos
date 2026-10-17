@@ -1,0 +1,46 @@
+
+@model IEnumerable<mvc.Models.Turno>
+
+@{
+    ViewData["Title"] = "Gestión de Turnos";
+}
+
+<div class="container mt-4">
+    <h2>Gestión de Turnos</h2>
+
+    <p>Listado de turnos médicos registrados.</p>
+
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Paciente</th>
+                <th>Profesional</th>
+                <th>Motivo</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var turno in Model)
+            {
+                <tr>
+                    <td>@turno.fecha.ToString("dd/MM/yyyy")</td>
+                    <td>@turno.hora.ToString("HH:mm")</td>
+                    <td>
+                        @(turno.Paciente != null
+                            ? $"{turno.Paciente.nombre} {turno.Paciente.apellido}"
+                            : "Sin paciente")
+                    </td>
+                    <td>
+                        @(turno.Profesional != null
+                            ? $"{turno.Profesional.nombre} {turno.Profesional.apellido}"
+                            : "Sin profesional")
+                    </td>
+                    <td>@turno.motivo</td>
+                    <td>@turno.estado</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -8,5 +8,8 @@ namespace mvc.Models
             : base(options)
         {
         }
+
+        public DbSet<Turno> Turnos { get; set; }
+        public DbSet<HorarioAtencion> HorariosAtencion { get; set; }
     }
 }

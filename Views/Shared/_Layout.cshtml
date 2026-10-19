@@ -1,47 +1,82 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Gestion_De_Turnos</title>
+    <title>@ViewData["Title"] - Gestión de Turnos</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Gestion_De_Turnos.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body class="app-body">
+    @{
+        var accountName = User.Identity?.Name ?? "Usuario";
+        var nameParts = accountName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var initials = string.Concat(nameParts.Take(2).Select(part => part[..1].ToUpperInvariant()));
+        var avatarPath = User.FindFirst("AvatarPath")?.Value;
+    }
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Gestion_De_Turnos</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg app-navbar">
+            <div class="container">
+                <a class="app-brand" asp-controller="Home" asp-action="Index">Gestión de Turnos</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation"
+                        aria-expanded="false" aria-label="Abrir navegación">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse" id="mainNavigation">
+                    <ul class="navbar-nav ms-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @if (User.IsInRole("Administrador") || User.IsInRole("Recepcionista"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Turnos" asp-action="Index">Turnos</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Profesional"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Turnos" asp-action="Index">Mi agenda</a>
+                            </li>
+                        }
                     </ul>
+
+                    <div class="app-account ms-lg-auto">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a class="app-profile-link" asp-controller="Account" asp-action="Perfil">
+                                @if (!string.IsNullOrWhiteSpace(avatarPath))
+                                {
+                                    <img class="app-avatar" src="@avatarPath" alt="" />
+                                }
+                                else
+                                {
+                                    <span class="app-avatar" aria-hidden="true">@(string.IsNullOrWhiteSpace(initials) ? "U" : initials)</span>
+                                }
+                                <span class="app-account-name">@accountName</span>
+                            </a>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                <button type="submit" class="app-logout">Cerrar sesión</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="btn app-button-primary px-3" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container app-main">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Gestion_De_Turnos - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

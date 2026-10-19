@@ -1,0 +1,280 @@
+:root {
+    --ink: #1f2d2b;
+    --muted: #667b79;
+    --teal: #216d68;
+    --teal-dark: #185a56;
+    --line: #dce6e1;
+}
+
+/* Login */
+body.auth-page {
+    min-height: 100vh;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px 18px;
+    color: var(--ink);
+    background: #f6f8f5;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.auth-shell {
+    width: min(100%, 400px);
+}
+
+.auth-card {
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.auth-card h1 {
+    margin: 0 0 22px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.auth-label {
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.auth-input {
+    min-height: 44px;
+}
+
+.auth-remember {
+    margin: 4px 0 20px;
+    font-size: 14px;
+}
+
+.auth-submit,
+.app-button-primary {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--teal);
+    border-radius: 8px;
+    color: #fff;
+    background: var(--teal);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.auth-submit:hover,
+.app-button-primary:hover {
+    border-color: var(--teal-dark);
+    color: #fff;
+    background: var(--teal-dark);
+}
+
+.auth-field-error {
+    display: block;
+    margin-top: 5px;
+    color: #9b3c3c;
+    font-size: 13px;
+}
+
+.auth-validation-summary:not(:empty) {
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border: 1px solid #f0cccc;
+    border-radius: 8px;
+    color: #8b3535;
+    background: #fff8f7;
+    font-size: 13px;
+}
+
+.auth-validation-summary ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+/* Navegación y contenido */
+.app-body {
+    min-height: 100vh;
+    margin-bottom: 0;
+    color: var(--ink);
+    background: #f6f8f5;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.app-navbar {
+    min-height: 60px;
+    border-bottom: 1px solid var(--line);
+    background: #fff;
+}
+
+.app-brand {
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.app-brand:hover {
+    color: var(--teal);
+}
+
+.app-navbar .nav-link {
+    padding: 8px 12px;
+    color: #526a67;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.app-navbar .nav-link:hover,
+.app-navbar .nav-link.active {
+    color: var(--teal);
+}
+
+.app-account {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.app-avatar {
+    display: inline-grid;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    color: var(--teal);
+    background: #e8f0eb;
+    font-size: 12px;
+    font-weight: 700;
+    object-fit: cover;
+}
+
+.app-account-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.app-logout {
+    border: 0;
+    color: var(--muted);
+    background: transparent;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.app-logout:hover {
+    color: var(--teal);
+}
+
+.app-main {
+    padding-top: 28px;
+    padding-bottom: 40px;
+}
+
+.page-heading {
+    margin: 0 0 20px;
+}
+
+.page-heading h1,
+.access-denied-panel h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.page-heading > p,
+.access-denied-panel > p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.content-panel {
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+}
+
+/* Perfil */
+.profile-page {
+    width: min(100%, 640px);
+    margin: 0 auto;
+}
+
+.profile-summary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.profile-avatar {
+    display: grid;
+    width: 72px;
+    height: 72px;
+    flex: 0 0 72px;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    color: var(--teal);
+    background: #e8f0eb;
+    font-size: 22px;
+    font-weight: 700;
+    object-fit: cover;
+}
+
+.profile-summary h2 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.profile-summary p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.profile-divider {
+    margin: 22px 0;
+    border-color: var(--line);
+    opacity: 1;
+}
+
+.profile-form {
+    max-width: 420px;
+}
+
+.profile-help {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.profile-alert {
+    font-size: 13px;
+}
+
+/* Acceso denegado */
+.access-denied-panel {
+    max-width: 520px;
+    margin: 10vh auto 0;
+    text-align: center;
+}
+
+.access-denied-panel .app-button-primary {
+    margin-top: 20px;
+    padding: 0 18px;
+    text-decoration: none;
+}

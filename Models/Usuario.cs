@@ -23,10 +23,28 @@ namespace mvc.Models
         public string email { get; set; } = string.Empty;
 
         [Column("password_hash")]
+        [Required]
+        [StringLength(300)]
         public string password_hash { get; set; } = string.Empty;
 
-        public string rol { get; set; } = string.Empty;
+        [Required]
+        public Rol rol { get; set; }
+
+        [StringLength(300)]
+        public string? avatar_path { get; set; }
+
+        [Column("profesional_id")]
+        public int? profesional_id { get; set; }
+
+        [ForeignKey(nameof(profesional_id))]
+        public Profesional? Profesional { get; set; }
 
         public bool activo { get; set; } = true;
+
+        [Column("fecha_creacion", TypeName = "timestamp without time zone")]
+        public DateTime fecha_creacion { get; set; }
+
+        [Column("fecha_ultimo_acceso", TypeName = "timestamp without time zone")]
+        public DateTime? fecha_ultimo_acceso { get; set; }
     }
 }

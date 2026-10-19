@@ -1,0 +1,91 @@
+@model mvc.Models.ViewModels.PerfilViewModel
+@{
+    ViewData["Title"] = "Mi perfil";
+    var nameParts = Model.NombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var initials = string.Concat(nameParts.Take(2).Select(part => part[..1].ToUpperInvariant()));
+    if (string.IsNullOrWhiteSpace(initials))
+    {
+        initials = "U";
+    }
+}
+
+<section class="profile-page">
+    <div class="page-heading">
+        <h1>Mi perfil</h1>
+    </div>
+
+    @if (TempData["ProfileMessage"] is string message)
+    {
+        <div class="alert alert-success profile-alert" role="status">@message</div>
+    }
+
+    <div class="content-panel">
+        <div class="profile-summary">
+            @if (!string.IsNullOrWhiteSpace(Model.AvatarPath))
+            {
+                <img id="avatarPreview" class="profile-avatar" src="@Model.AvatarPath" alt="Imagen de perfil actual" />
+                <div id="avatarInitials" class="profile-avatar profile-avatar-initials" aria-hidden="true" hidden>@initials</div>
+            }
+            else
+            {
+                <img id="avatarPreview" class="profile-avatar" alt="Vista previa de la imagen de perfil" hidden />
+                <div id="avatarInitials" class="profile-avatar profile-avatar-initials" aria-hidden="true">@initials</div>
+            }
+
+            <div>
+                <h2>@Model.NombreCompleto</h2>
+                <p>@Model.Email</p>
+            </div>
+        </div>
+
+        <hr class="profile-divider" />
+
+        <form asp-controller="Account"
+              asp-action="Perfil"
+              method="post"
+              enctype="multipart/form-data"
+              class="profile-form">
+            <div asp-validation-summary="ModelOnly" class="auth-validation-summary" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="Avatar" class="form-label auth-label"></label>
+                <input asp-for="Avatar"
+                       id="avatarFile"
+                       class="form-control auth-input"
+                       type="file"
+                       accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+                <span asp-validation-for="Avatar" class="auth-field-error"></span>
+                <p class="profile-help">JPG, PNG o WebP. Tamaño máximo: 2 MB.</p>
+            </div>
+
+            <button type="submit" class="btn app-button-primary">Actualizar imagen</button>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (() => {
+            const input = document.getElementById("avatarFile");
+            const preview = document.getElementById("avatarPreview");
+            const initials = document.getElementById("avatarInitials");
+            let currentUrl;
+
+            input?.addEventListener("change", () => {
+                const file = input.files?.[0];
+                if (!file || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+                    return;
+                }
+
+                if (currentUrl) {
+                    URL.revokeObjectURL(currentUrl);
+                }
+
+                currentUrl = URL.createObjectURL(file);
+                preview.src = currentUrl;
+                preview.hidden = false;
+                initials.hidden = true;
+            });
+        })();
+    </script>
+}

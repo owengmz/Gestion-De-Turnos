@@ -1,0 +1,51 @@
+@model mvc.Models.ViewModels.LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Iniciar sesión";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Gestión de Turnos</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <section class="auth-card" aria-labelledby="login-heading">
+            <h1 id="login-heading">Iniciar sesión</h1>
+
+            <form asp-controller="Account" asp-action="Login" method="post" class="auth-form">
+                <input asp-for="ReturnUrl" type="hidden" />
+                <div asp-validation-summary="ModelOnly" class="auth-validation-summary" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label auth-label"></label>
+                    <input asp-for="Email" class="form-control auth-input" autocomplete="username" inputmode="email" />
+                    <span asp-validation-for="Email" class="auth-field-error"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label auth-label"></label>
+                    <input asp-for="Password" class="form-control auth-input" autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="auth-field-error"></span>
+                </div>
+
+                <div class="form-check auth-remember">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label"></label>
+                </div>
+
+                <button type="submit" class="btn auth-submit w-100">Iniciar sesión</button>
+            </form>
+        </section>
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

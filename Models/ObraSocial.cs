@@ -1,11 +1,15 @@
+// dependencias (imports)
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+// paquete
 namespace mvc.Models
 {
+  // atributo de clase: enlaza la clase con la tabla
   [Table("obra_social")]
   public class ObraSocial
   {
+    // propiedades (atributo + getter + setter)
     [Key]
     public int id { get; set; }
 
@@ -20,5 +24,9 @@ namespace mvc.Models
 
     [Display(Name = "Activa")]
     public bool estado { get; set; } = true;
+
+    // relacion 
+    public ICollection<Paciente> Pacientes { get; set; } = new List<Paciente>();
+
   }
 }

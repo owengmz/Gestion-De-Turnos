@@ -55,6 +55,26 @@ namespace mvc.Models
                   .HasForeignKey(profesional => profesional.especialidad_id)
                   .OnDelete(DeleteBehavior.Restrict);
       });
+
+      modelBuilder.Entity<ObraSocial>()
+    .Property(obraSocial => obraSocial.estado)
+    .HasDefaultValue(true);
+
+      modelBuilder.Entity<Paciente>(entity =>
+      {
+        // el dni no se puede repetir entre pacientes
+        entity.HasIndex(paciente => paciente.dni).IsUnique();
+
+        // un paciente nuevo nace activo
+        entity.Property(paciente => paciente.estado)
+                  .HasDefaultValue(true);
+
+        // un paciente tiene una obra social (opcional) y una obra social tiene muchos pacientes
+        entity.HasOne(paciente => paciente.ObraSocial)
+                  .WithMany(obraSocial => obraSocial.Pacientes)
+                  .HasForeignKey(paciente => paciente.obra_social_id)
+                  .OnDelete(DeleteBehavior.Restrict);
+      });
     }
   }
 }

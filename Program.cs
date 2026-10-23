@@ -19,21 +19,56 @@ builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromHours(8);
-        options.SlidingExpiration = true;
-        options.Cookie.Name = "GestionDeTurnos.Auth";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
-            ? CookieSecurePolicy.SameAsRequest
-            : CookieSecurePolicy.Always;
+      options.LoginPath = "/Account/Login";
+      options.AccessDeniedPath = "/Account/AccessDenied";
+      options.ExpireTimeSpan = TimeSpan.FromHours(8);
+      options.SlidingExpiration = true;
+      options.Cookie.Name = "GestionDeTurnos.Auth";
+      options.Cookie.HttpOnly = true;
+      options.Cookie.SameSite = SameSiteMode.Lax;
+      options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+          ? CookieSecurePolicy.SameAsRequest
+          : CookieSecurePolicy.Always;
     });
 builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+// Si no hay usuarios, creamos el primer administrador
+using (var scope = app.Services.CreateScope())
+{
+  var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+  var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<Usuario>>();
+
+  if (!db.Usuarios.Any())
+  {
+    const string emailAdmin = "admin@admin.com";
+    const string claveAdmin = "admin123";
+
+    var admin = new Usuario
+    {
+      nombre = "Admin",
+      apellido = "Sistema",
+      email = emailAdmin,
+      rol = Rol.Administrador,
+      activo = true
+    };
+    admin.password_hash = hasher.HashPassword(admin, claveAdmin);
+
+    db.Usuarios.Add(admin);
+    db.SaveChanges();
+
+    // Mostramos las credenciales en consola (solo desarrollo)
+    if (app.Environment.IsDevelopment())
+    {
+      Console.WriteLine("========================================");
+      Console.WriteLine("  Primer administrador creado");
+      Console.WriteLine($"  Email: {emailAdmin}");
+      Console.WriteLine($"  Clave: {claveAdmin}");
+      Console.WriteLine("========================================");
+    }
+  }
+}
 using (var scope = app.Services.CreateScope())
 {
   var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

@@ -1,0 +1,84 @@
+@model mvc.Models.Especialidad
+
+@{
+    ViewData["Title"] = "Nueva Especialidad";
+}
+
+<div class="py-3">
+    <!-- Botón para volver al listado de especialidades -->
+    <div class="mb-3">
+        <a asp-action="Index" class="text-decoration-none text-muted d-inline-flex align-items-center gap-1">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            <span>Volver al catálogo</span>
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge rounded-pill bg-primary-subtle text-primary p-2">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/>
+                            </svg>
+                        </span>
+                        <h2 class="h4 fw-bold mb-0" style="color: var(--teal, #216d68);">Nueva Especialidad</h2>
+                    </div>
+                    <p class="text-muted small">Registra una especialidad médica para asignar a los profesionales del centro.</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label asp-for="nombre" class="form-label fw-semibold text-dark">
+                                Nombre de la Especialidad <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="nombre" class="form-control form-control-lg fs-6" 
+                                   placeholder="Ej: Cardiología, Traumatología, Pediatría..." autofocus />
+                            <span asp-validation-for="nombre" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <label asp-for="descripcion" class="form-label fw-semibold text-dark">
+                                Descripción
+                            </label>
+                            <textarea asp-for="descripcion" rows="3" class="form-control" 
+                                      placeholder="Breve reseña del alcance clínico de esta especialidad (opcional)..."></textarea>
+                            <span asp-validation-for="descripcion" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" asp-for="estado" id="estadoSwitch" checked />
+                                <label class="form-check-label fw-medium text-dark" for="estadoSwitch">
+                                    Habilitada / Activa inmediatamente
+                                </label>
+                            </div>
+                            <div class="form-text small">Las especialidades activas están disponibles para asignarse a médicos y turnos.</div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancelar</a>
+                            <button type="submit" class="btn app-button-primary px-4">Guardar Especialidad</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

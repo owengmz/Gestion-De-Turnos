@@ -1,0 +1,134 @@
+@model mvc.Models.Profesional
+
+@{
+    ViewData["Title"] = "Nuevo Profesional Médico";
+}
+
+<div class="py-3">
+    <!-- Botón para volver al listado de profesionales -->
+    <div class="mb-3">
+        <a asp-action="Index" class="text-decoration-none text-muted d-inline-flex align-items-center gap-1">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            <span>Volver al listado</span>
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge rounded-pill bg-primary-subtle text-primary p-2">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                            </svg>
+                        </span>
+                        <h2 class="h4 fw-bold mb-0" style="color: var(--teal, #216d68);">Registrar Nuevo Profesional</h2>
+                    </div>
+                    <p class="text-muted small">Ingresa la información personal, matrícula y especialidad médica asignada.</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                        <!-- Sección 1: Datos Personales -->
+                        <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                            1. Datos Personales
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="nombre" class="form-label fw-semibold text-dark">
+                                    Nombre <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="nombre" class="form-control" placeholder="Ej: Carlos Alberto" autofocus />
+                                <span asp-validation-for="nombre" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="apellido" class="form-label fw-semibold text-dark">
+                                    Apellido <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="apellido" class="form-control" placeholder="Ej: Gómez" />
+                                <span asp-validation-for="apellido" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="dni" class="form-label fw-semibold text-dark">
+                                    DNI <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="dni" class="form-control" placeholder="Ej: 32456789 (único)" />
+                                <span asp-validation-for="dni" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Sección 2: Especialidad y Matrícula -->
+                        <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                            2. Especialidad y Matrícula
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="matricula" class="form-label fw-semibold text-dark">
+                                    Matrícula Profesional <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="matricula" class="form-control" placeholder="Ej: MP-48123 (única)" />
+                                <span asp-validation-for="matricula" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="especialidad_id" class="form-label fw-semibold text-dark">
+                                    Especialidad Médica <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="especialidad_id" asp-items="ViewBag.Especialidades" class="form-select">
+                                    <option value="">-- Seleccione una especialidad --</option>
+                                </select>
+                                <span asp-validation-for="especialidad_id" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Sección 3: Contacto y Estado -->
+                        <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                            3. Contacto y Estado
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="email" class="form-label fw-semibold text-dark">
+                                    Correo Electrónico
+                                </label>
+                                <input asp-for="email" type="email" class="form-control" placeholder="doctor@clinica.com" />
+                                <span asp-validation-for="email" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="telefono" class="form-label fw-semibold text-dark">
+                                    Teléfono
+                                </label>
+                                <input asp-for="telefono" class="form-control" placeholder="+54 9 11 4455-6677" />
+                                <span asp-validation-for="telefono" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" role="switch" asp-for="estado" id="estadoSwitch" checked />
+                                    <label class="form-check-label fw-medium text-dark" for="estadoSwitch">
+                                        Profesional Habilitado / Activo
+                                    </label>
+                                </div>
+                                <div class="form-text small">Los médicos activos estarán disponibles para la asignación de turnos.</div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancelar</a>
+                            <button type="submit" class="btn app-button-primary px-4">Guardar Profesional</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

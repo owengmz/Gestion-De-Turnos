@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -34,6 +34,12 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Turnos" asp-action="Index">Turnos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Profesionales" asp-action="Index">Profesionales</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Especialidades" asp-action="Index">Especialidades</a>
                             </li>
                         }
                         else if (User.IsInRole("Profesional"))

@@ -17,7 +17,12 @@ namespace mvc.Controllers
     {
       _context = context;
     }
-
+    // GET: /ObrasSociales  (pagina que aloja la app Vue)
+    [HttpGet]
+    public IActionResult Index()
+    {
+      return View();
+    }
     // GET: /ObrasSociales/Listar?buscar=osde&page=1&pageSize=10
     [HttpGet]
     public async Task<IActionResult> Listar(string? buscar, int page = 1, int pageSize = 10)

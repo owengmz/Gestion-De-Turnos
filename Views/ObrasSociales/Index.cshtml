@@ -1,0 +1,146 @@
+@{
+  ViewData["Title"] = "Obras Sociales";
+}
+
+<style>
+  [v-cloak] {
+    display: none;
+  }
+
+  .th-app {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+</style>
+
+<div id="app" v-cloak class="py-3">
+
+  <!-- encabezado -->
+  <div
+    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-2 border-bottom">
+    <div>
+      <h1 class="h3 fw-bold mb-1" style="color: var(--teal, #216d68);">Catalogo de Obras Sociales</h1>
+      <p class="text-muted mb-0">Gestion y administracion de las obras sociales que atiende la clinica.</p>
+    </div>
+    <div>
+      <button class="btn app-button-primary px-3 shadow-sm" v-on:click="abrirNuevo">Nueva Obra Social</button>
+    </div>
+  </div>
+
+  <!-- avisos -->
+  <div v-if="mensajeOk" class="alert alert-success shadow-sm mb-4">{{ mensajeOk }}</div>
+  <div v-if="error" class="alert alert-danger shadow-sm mb-4">{{ error }}</div>
+
+  <!-- busqueda -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background: #ffffff;">
+    <div class="card-body p-3">
+      <input type="text" class="form-control" placeholder="Buscar por nombre..." v-model="buscar"
+             v-on:input="buscarConRetraso" />
+    </div>
+  </div>
+
+  <!-- tabla -->
+  <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead style="background-color: #f1f6f4; border-bottom: 2px solid #dce6e1;">
+          <tr>
+            <th class="ps-4 text-secondary text-uppercase fw-semibold th-app" style="width: 80px;">ID</th>
+            <th class="text-secondary text-uppercase fw-semibold th-app">Nombre</th>
+            <th class="text-secondary text-uppercase fw-semibold th-app">Descripcion</th>
+            <th class="text-secondary text-uppercase fw-semibold text-center th-app" style="width: 120px;">Estado</th>
+            <th class="pe-4 text-secondary text-uppercase fw-semibold text-end th-app" style="width: 260px;">Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="o in items" :key="o.id" :class="{ 'table-light opacity-75': !o.estado }">
+            <td class="ps-4 fw-semibold text-muted">#{{ o.id }}</td>
+            <td><span class="fw-bold text-dark">{{ o.nombre }}</span></td>
+            <td>
+              <span v-if="o.descripcion" class="text-muted">{{ o.descripcion }}</span>
+              <span v-else class="text-muted fst-italic">Sin descripcion</span>
+            </td>
+            <td class="text-center">
+              <span v-if="o.estado"
+                    class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-1">Activa</span>
+              <span v-else
+                    class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1">Inactiva</span>
+            </td>
+            <td class="pe-4 text-end">
+              <div class="d-inline-flex gap-1">
+                <button class="btn btn-sm btn-outline-primary" v-on:click="abrirEditar(o)">Editar</button>
+                <button class="btn btn-sm" :class="o.estado ? 'btn-outline-warning' : 'btn-outline-success'"
+                        v-on:click="cambiarEstado(o)">{{ o.estado ? 'Desactivar' : 'Activar' }}</button>
+                <button v-if="esAdmin" class="btn btn-sm btn-outline-danger" v-on:click="eliminar(o)">Eliminar</button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="!cargando && items.length === 0">
+            <td colspan="5" class="text-center py-5">
+              <p class="h6 fw-normal mb-1 text-muted">No se encontraron obras sociales</p>
+              <small class="text-muted">Proba cambiando la busqueda o agregando una nueva obra social.</small>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- paginado -->
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+      <small class="text-muted">
+        {{ totalItems }} registros - pagina {{ page }} de {{ totalPages || 1 }}
+      </small>
+      <div>
+        <button class="btn btn-outline-secondary btn-sm me-1" :disabled="!hasPrevious"
+                v-on:click="irAPagina(page - 1)">Anterior</button>
+        <button class="btn btn-outline-secondary btn-sm" :disabled="!hasNext"
+                v-on:click="irAPagina(page + 1)">Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal de alta y edicion -->
+  <div v-if="modalAbierto">
+    <div class="modal d-block" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+          <form v-on:submit.prevent="guardar" novalidate>
+            <div class="modal-header" style="background-color: #f1f6f4;">
+              <h5 class="modal-title fw-bold" style="color: var(--teal, #216d68);">
+                {{ form.id ? 'Editar obra social' : 'Nueva obra social' }}
+              </h5>
+              <button type="button" class="btn-close" v-on:click="cerrarModal"></button>
+            </div>
+            <div class="modal-body">
+              <div v-if="errorForm" class="alert alert-danger">{{ errorForm }}</div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Nombre</label>
+                <input type="text" class="form-control" maxlength="100" v-model="form.nombre" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Descripcion</label>
+                <textarea class="form-control" rows="3" maxlength="300" v-model="form.descripcion"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-light border" v-on:click="cerrarModal">Cancelar</button>
+              <button type="submit" class="btn app-button-primary px-3" :disabled="guardando">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+  </div>
+</div>
+
+@section Scripts {
+  <script>
+    // el rol se resuelve en el servidor y se lo pasamos al script
+    window.esAdmin = @(User.IsInRole("Administrador") ? "true" : "false");
+  </script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="~/js/obrasSociales.js" asp-append-version="true"></script>
+}

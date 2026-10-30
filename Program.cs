@@ -32,6 +32,7 @@ builder.Services
     });
 builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<CredencialStorageService>();
 
 var app = builder.Build();
 // Si no hay usuarios, creamos el primer administrador

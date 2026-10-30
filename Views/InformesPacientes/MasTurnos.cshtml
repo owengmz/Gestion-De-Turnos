@@ -1,0 +1,129 @@
+@model mvc.Models.ResultadoPaginado<mvc.Models.FilaMasTurnos>
+
+@{
+  ViewData["Title"] = "Pacientes con mas turnos";
+  var desde = ViewBag.Desde as string;
+  var hasta = ViewBag.Hasta as string;
+  var estadoTurno = ViewBag.EstadoTurno as string;
+  var estados = ViewBag.Estados as List<string> ?? new List<string>();
+  var totalPaginas = Model.TotalPaginas == 0 ? 1 : Model.TotalPaginas;
+  var hayFiltros = !string.IsNullOrWhiteSpace(desde) || !string.IsNullOrWhiteSpace(hasta) ||
+!string.IsNullOrWhiteSpace(estadoTurno);
+  // posicion de la primera fila de la pagina en el ranking
+  var inicio = (Model.Pagina - 1) * Model.RegistrosPorPagina;
+}
+
+<div class="py-3">
+
+  <!-- encabezado -->
+  <div
+    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-2 border-bottom">
+    <div>
+      <h1 class="h3 fw-bold mb-1" style="color: var(--teal, #216d68);">Pacientes con mas turnos</h1>
+      <p class="text-muted mb-0">Ranking de pacientes segun la cantidad de turnos registrados.</p>
+    </div>
+  </div>
+
+  <!-- filtros -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background: #ffffff;">
+    <div class="card-body p-3">
+      <form method="get" asp-action="MasTurnos" class="row g-2 align-items-end">
+        <div class="col-6 col-md-3">
+          <label for="desde" class="form-label small text-muted mb-1">Desde</label>
+          <input type="date" id="desde" name="desde" value="@desde" class="form-control" />
+        </div>
+        <div class="col-6 col-md-3">
+          <label for="hasta" class="form-label small text-muted mb-1">Hasta</label>
+          <input type="date" id="hasta" name="hasta" value="@hasta" class="form-control" />
+        </div>
+        <div class="col-12 col-md-3">
+          <label for="estadoTurno" class="form-label small text-muted mb-1">Estado del turno</label>
+          <select id="estadoTurno" name="estadoTurno" class="form-select">
+            <option value="">Todos los estados</option>
+            @foreach (var estado in estados)
+            {
+              <option value="@estado" selected="@(estado == estadoTurno)">@estado</option>
+            }
+          </select>
+        </div>
+        <div class="col-12 col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-outline-secondary w-100">Filtrar</button>
+          @if (hayFiltros)
+          {
+            <a asp-action="MasTurnos" class="btn btn-light border text-muted" title="Limpiar filtros">Limpiar</a>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- tabla -->
+  <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead style="background-color: #f1f6f4; border-bottom: 2px solid #dce6e1;">
+          <tr>
+            <th class="ps-4 text-secondary text-uppercase fw-semibold text-center"
+                style="font-size: 0.75rem; letter-spacing: 0.05em; width: 80px;">#</th>
+            <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+              DNI</th>
+              <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                Paciente</th>
+                <th class="text-secondary text-uppercase fw-semibold text-center"
+                    style="font-size: 0.75rem; letter-spacing: 0.05em;">Turnos</th>
+                <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                  Ultimo turno</th>
+                  <th class="text-secondary text-uppercase fw-semibold text-end pe-4"
+                      style="font-size: 0.75rem; letter-spacing: 0.05em;">Detalle</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (Model.Registros.Any())
+                {
+                  var posicion = inicio;
+                  foreach (var fila in Model.Registros)
+                  {
+                    posicion++;
+                    <tr>
+                      <td class="ps-4 text-center fw-semibold text-muted">@posicion</td>
+                      <td class="text-muted">@fila.dni</td>
+                      <td><span class="fw-bold text-dark">@fila.apellido, @fila.nombre</span></td>
+                      <td class="text-center">
+                        <span
+                        class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3 py-1">@fila.cantidad_turnos</span>
+                      </td>
+                      <td class="text-muted">@fila.ultimo_turno.ToString("dd/MM/yyyy")</td>
+                      <td class="text-end pe-4">
+                        <a asp-controller="Pacientes" asp-action="Detalles" asp-route-id="@fila.paciente_id"
+                           class="btn btn-outline-secondary btn-sm">Detalles</a>
+                      </td>
+                    </tr>
+                  }
+                }
+                else
+                {
+                  <tr>
+                    <td colspan="6" class="text-center py-5">
+                      <p class="h6 fw-normal mb-1 text-muted">No hay turnos para mostrar</p>
+                      <small class="text-muted">Proba cambiando el rango de fechas o el estado.</small>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- paginado -->
+          <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+            <small class="text-muted">@Model.TotalRegistros pacientes - pagina @Model.Pagina de @totalPaginas</small>
+            <div>
+              <a asp-action="MasTurnos" asp-route-pagina="@(Model.Pagina - 1)" asp-route-desde="@desde"
+                 asp-route-hasta="@hasta" asp-route-estadoTurno="@estadoTurno"
+                 class="btn btn-outline-secondary btn-sm me-1 @(Model.TienePaginaAnterior ? "" : "disabled")">Anterior</a>
+              <a asp-action="MasTurnos" asp-route-pagina="@(Model.Pagina + 1)" asp-route-desde="@desde"
+                 asp-route-hasta="@hasta" asp-route-estadoTurno="@estadoTurno"
+                 class="btn btn-outline-secondary btn-sm @(Model.TienePaginaSiguiente ? "" : "disabled")">Siguiente</a>
+            </div>
+          </div>
+        </div>
+      </div>

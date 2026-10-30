@@ -1,0 +1,106 @@
+@model mvc.Models.ResultadoPaginado<mvc.Models.FilaPorObraSocial>
+
+@{
+  ViewData["Title"] = "Pacientes por obra social";
+  var filtro = ViewBag.EstadoFiltro as string ?? "activos";
+  var totalPaginas = Model.TotalPaginas == 0 ? 1 : Model.TotalPaginas;
+  // el mayor de la pagina sirve de referencia para las barras
+  var maximo = Model.Registros.Any() ? Model.Registros.Max(f => f.cantidad_pacientes) : 1;
+}
+
+<div class="py-3">
+
+  <!-- encabezado -->
+  <div
+    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-2 border-bottom">
+    <div>
+      <h1 class="h3 fw-bold mb-1" style="color: var(--teal, #216d68);">Pacientes por obra social</h1>
+      <p class="text-muted mb-0">Cantidad de pacientes agrupados por cobertura.</p>
+    </div>
+  </div>
+
+  <!-- filtro -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background: #ffffff;">
+    <div class="card-body p-3">
+      <form method="get" asp-action="PorObraSocial" class="row g-2 align-items-center">
+        <div class="col-12 col-md-8 col-lg-9">
+          <select name="estadoFiltro" class="form-select">
+            <option value="activos" selected="@(filtro == "activos")">Solo pacientes activos</option>
+            <option value="inactivos" selected="@(filtro == "inactivos")">Solo pacientes inactivos</option>
+            <option value="todos" selected="@(filtro == "todos")">Todos los pacientes</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-4 col-lg-3">
+          <button type="submit" class="btn btn-outline-secondary w-100">Filtrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- tabla -->
+  <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead style="background-color: #f1f6f4; border-bottom: 2px solid #dce6e1;">
+          <tr>
+            <th class="ps-4 text-secondary text-uppercase fw-semibold"
+                style="font-size: 0.75rem; letter-spacing: 0.05em;">Obra social</th>
+            <th class="text-secondary text-uppercase fw-semibold text-center"
+                style="font-size: 0.75rem; letter-spacing: 0.05em; width: 140px;">Pacientes</th>
+            <th class="text-secondary text-uppercase fw-semibold pe-4"
+                style="font-size: 0.75rem; letter-spacing: 0.05em; width: 35%;">Proporcion</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (Model.Registros.Any())
+          {
+            foreach (var fila in Model.Registros)
+            {
+              var porcentaje = (int)Math.Round(fila.cantidad_pacientes * 100.0 / maximo);
+              <tr>
+                <td class="ps-4">
+                  @if (fila.obra_social == "Sin obra social")
+                  {
+                    <span class="text-muted fst-italic">@fila.obra_social</span>
+                  }
+                  else
+                  {
+                    <span class="fw-bold text-dark">@fila.obra_social</span>
+                  }
+                </td>
+                <td class="text-center fw-semibold">@fila.cantidad_pacientes</td>
+                <td class="pe-4">
+                  <div class="progress" style="height: 10px;">
+                    <div class="progress-bar" role="progressbar"
+                         style="width: @(porcentaje)%; background-color: var(--teal, #216d68);" aria-valuenow="@porcentaje"
+                         aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+          else
+          {
+            <tr>
+              <td colspan="3" class="text-center py-5">
+                <p class="h6 fw-normal mb-1 text-muted">No hay datos para mostrar</p>
+                <small class="text-muted">Proba cambiando el filtro de estado.</small>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- paginado -->
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+      <small class="text-muted">@Model.TotalRegistros grupos - pagina @Model.Pagina de @totalPaginas</small>
+      <div>
+        <a asp-action="PorObraSocial" asp-route-pagina="@(Model.Pagina - 1)" asp-route-estadoFiltro="@filtro"
+           class="btn btn-outline-secondary btn-sm me-1 @(Model.TienePaginaAnterior ? "" : "disabled")">Anterior</a>
+        <a asp-action="PorObraSocial" asp-route-pagina="@(Model.Pagina + 1)" asp-route-estadoFiltro="@filtro"
+           class="btn btn-outline-secondary btn-sm @(Model.TienePaginaSiguiente ? "" : "disabled")">Siguiente</a>
+      </div>
+    </div>
+  </div>
+</div>

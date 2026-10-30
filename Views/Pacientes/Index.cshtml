@@ -5,6 +5,9 @@
   var buscar = ViewBag.Buscar as string;
   var filtro = ViewBag.EstadoFiltro as string ?? "todos";
   var totalPaginas = Model.TotalPaginas == 0 ? 1 : Model.TotalPaginas;
+  // mismos roles que autoriza el controlador
+  var puedeGestionar = User.IsInRole("Administrador") || User.IsInRole("Recepcionista");
+  var esAdmin = User.IsInRole("Administrador");
 }
 
 <div class="py-3">
@@ -16,7 +19,21 @@
       <h1 class="h3 fw-bold mb-1" style="color: var(--teal, #216d68);">Pacientes</h1>
       <p class="text-muted mb-0">Gestion y consulta de los pacientes registrados en la clinica.</p>
     </div>
+    @if (puedeGestionar)
+    {
+      <a asp-action="Crear" class="btn app-button-primary px-4">Nuevo paciente</a>
+    }
   </div>
+
+  <!-- mensajes del controlador -->
+  @if (TempData["Mensaje"] is string mensaje)
+  {
+    <div class="alert alert-success py-2 small" role="alert">@mensaje</div>
+  }
+  @if (TempData["Error"] is string error)
+  {
+    <div class="alert alert-danger py-2 small" role="alert">@error</div>
+  }
 
   <!-- busqueda y filtros -->
   <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background: #ffffff;">
@@ -60,6 +77,8 @@
                   Obra social</th>
                   <th class="text-secondary text-uppercase fw-semibold text-center"
                       style="font-size: 0.75rem; letter-spacing: 0.05em; width: 120px;">Estado</th>
+                  <th class="text-secondary text-uppercase fw-semibold text-end pe-4"
+                      style="font-size: 0.75rem; letter-spacing: 0.05em;">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -93,13 +112,37 @@
                           class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1">Inactivo</span>
                         }
                       </td>
+                      <td class="text-end pe-4">
+                        <div class="d-inline-flex gap-1">
+                          <a asp-action="Detalles" asp-route-id="@item.id" class="btn btn-outline-secondary btn-sm">Detalles</a>
+
+                          @if (puedeGestionar)
+                          {
+                            <a asp-action="Editar" asp-route-id="@item.id" class="btn btn-outline-primary btn-sm">Editar</a>
+
+                            <form asp-action="CambiarEstado" asp-route-id="@item.id" method="post" class="m-0">
+                              <button type="submit" class="btn btn-outline-warning btn-sm">
+                                @(item.estado ? "Desactivar" : "Activar")
+                              </button>
+                            </form>
+                          }
+
+                          @if (esAdmin)
+                          {
+                            <form asp-action="Eliminar" asp-route-id="@item.id" method="post" class="m-0"
+                                  onsubmit="return confirm('Eliminar al paciente @item.apellido, @item.nombre? Esta accion no se puede deshacer.');">
+                              <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                            </form>
+                          }
+                        </div>
+                      </td>
                     </tr>
                   }
                 }
                 else
                 {
                   <tr>
-                    <td colspan="5" class="text-center py-5">
+                    <td colspan="6" class="text-center py-5">
                       <p class="h6 fw-normal mb-1 text-muted">No se encontraron pacientes</p>
                       <small class="text-muted">Proba cambiando los filtros de busqueda.</small>
                     </td>

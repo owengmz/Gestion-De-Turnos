@@ -1,0 +1,186 @@
+@model mvc.Models.Paciente
+
+@{
+  ViewData["Title"] = "Nuevo Paciente";
+  // nombre de la obra social elegida, lo carga el controlador si el form vuelve con errores
+  var nombreObra = ViewBag.ObraSocialNombre as string;
+}
+
+<div class="py-3">
+  <div class="mb-3">
+    <a asp-action="Index" class="text-decoration-none text-muted">Volver al listado</a>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+          <h2 class="h4 fw-bold mb-1" style="color: var(--teal, #216d68);">Registrar Nuevo Paciente</h2>
+          <p class="text-muted small">Ingresa los datos personales, la obra social y, si corresponde, la imagen de la
+            credencial.</p>
+          </div>
+
+          <div class="card-body p-4">
+            <form asp-action="Crear" method="post" enctype="multipart/form-data" novalidate>
+              <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+              <!-- seccion 1: datos personales -->
+              <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom"
+                  style="font-size: 0.8rem; letter-spacing: 0.05em;">1. Datos personales</h6>
+              <div class="row g-3 mb-4">
+                <div class="col-12 col-md-6">
+                  <label asp-for="nombre" class="form-label fw-semibold text-dark">Nombre <span
+                    class="text-danger">*</span></label>
+                    <input asp-for="nombre" class="form-control" placeholder="Ej: Maria Laura" autofocus />
+                    <span asp-validation-for="nombre" class="text-danger small"></span>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label asp-for="apellido" class="form-label fw-semibold text-dark">Apellido <span
+                      class="text-danger">*</span></label>
+                      <input asp-for="apellido" class="form-control" placeholder="Ej: Perez" />
+                      <span asp-validation-for="apellido" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label asp-for="dni" class="form-label fw-semibold text-dark">DNI <span
+                        class="text-danger">*</span></label>
+                        <input asp-for="dni" class="form-control" placeholder="Ej: 32456789 (unico)" />
+                        <span asp-validation-for="dni" class="text-danger small"></span>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label asp-for="fecha_nacimiento" class="form-label fw-semibold text-dark"></label>
+                        <input asp-for="fecha_nacimiento" type="date" class="form-control" />
+                        <span asp-validation-for="fecha_nacimiento" class="text-danger small"></span>
+                      </div>
+                    </div>
+
+                    <!-- seccion 2: contacto -->
+                    <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom"
+                        style="font-size: 0.8rem; letter-spacing: 0.05em;">2. Contacto</h6>
+                    <div class="row g-3 mb-4">
+                      <div class="col-12 col-md-6">
+                        <label asp-for="telefono" class="form-label fw-semibold text-dark"></label>
+                        <input asp-for="telefono" class="form-control" placeholder="Ej: 2664 123456" />
+                        <span asp-validation-for="telefono" class="text-danger small"></span>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label asp-for="email" class="form-label fw-semibold text-dark"></label>
+                        <input asp-for="email" type="email" class="form-control" placeholder="paciente@correo.com" />
+                        <span asp-validation-for="email" class="text-danger small"></span>
+                      </div>
+                      <div class="col-12">
+                        <label asp-for="direccion" class="form-label fw-semibold text-dark"></label>
+                        <input asp-for="direccion" class="form-control" placeholder="Calle, numero y localidad" />
+                        <span asp-validation-for="direccion" class="text-danger small"></span>
+                      </div>
+                    </div>
+
+                    <!-- seccion 3: cobertura -->
+                    <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom"
+                        style="font-size: 0.8rem; letter-spacing: 0.05em;">3. Cobertura</h6>
+                    <div class="row g-3 mb-4">
+                      <div class="col-12 col-md-6">
+                        <label asp-for="obra_social_id" class="form-label fw-semibold text-dark"></label>
+                        <select asp-for="obra_social_id" class="form-select">
+                          <option value=""></option>
+                          @if (Model.obra_social_id.HasValue && !string.IsNullOrEmpty(nombreObra))
+                          {
+                            <option value="@Model.obra_social_id" selected>@nombreObra</option>
+                          }
+                        </select>
+                        <span asp-validation-for="obra_social_id" class="text-danger small"></span>
+                        <div class="form-text small">Escribi para buscar. Se puede dejar vacio si no tiene obra social.</div>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label asp-for="numero_afiliado" class="form-label fw-semibold text-dark"></label>
+                        <input asp-for="numero_afiliado" class="form-control" placeholder="Ej: 0123456789" />
+                        <span asp-validation-for="numero_afiliado" class="text-danger small"></span>
+                      </div>
+                      <div class="col-12">
+                        <label for="credencial" class="form-label fw-semibold text-dark">Imagen de la credencial</label>
+                        <input type="file" id="credencial" name="credencial" class="form-control"
+                               accept=".jpg,.jpeg,.png,.webp" />
+                        <div id="credencialError" class="text-danger small"></div>
+                        @Html.ValidationMessage("credencial", new { @class = "text-danger small" })
+                        <div class="form-text small">Opcional. JPG, PNG o WebP de hasta 2 MB.</div>
+                        <img id="credencialVista" alt="Vista previa de la credencial" class="img-thumbnail mt-2 d-none"
+                             style="max-height: 180px;" />
+                      </div>
+                    </div>
+
+                    <!-- seccion 4: estado -->
+                    <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom"
+                        style="font-size: 0.8rem; letter-spacing: 0.05em;">4. Estado</h6>
+                    <div class="form-check form-switch mb-4">
+                      <input asp-for="estado" class="form-check-input" role="switch" />
+                      <label asp-for="estado" class="form-check-label fw-medium text-dark">Paciente activo</label>
+                      <div class="form-text small">Solo los pacientes activos se pueden asignar a turnos.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                      <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancelar</a>
+                      <button type="submit" class="btn app-button-primary px-4">Guardar paciente</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        @section Scripts {
+          <partial name="_ValidationScriptsPartial" />
+          <script>
+            $(function () {
+              // select2 de obra social: busca en el servidor, nunca carga la lista completa
+              $('#obra_social_id').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Buscar obra social...',
+                allowClear: true,
+                language: {
+                  noResults: function () { return 'Sin resultados'; },
+                  searching: function () { return 'Buscando...'; }
+                },
+                ajax: {
+                  url: '@Url.Action("Buscar", "ObrasSociales")',
+                  dataType: 'json',
+                  delay: 250,
+                  // el servidor espera term y page
+                  data: function (params) {
+                    return { term: params.term || '', page: params.page || 1 };
+                  }
+                }
+              });
+
+              // vista previa y control rapido de la credencial
+              const maximo = 2 * 1024 * 1024;
+              const permitidas = ['image/jpeg', 'image/png', 'image/webp'];
+              const vista = $('#credencialVista');
+              const aviso = $('#credencialError');
+
+              $('#credencial').on('change', function () {
+                const archivo = this.files[0];
+                aviso.text('');
+                vista.addClass('d-none').removeAttr('src');
+
+                if (!archivo) {
+                  return;
+                }
+
+                if (!permitidas.includes(archivo.type)) {
+                  aviso.text('El formato debe ser JPG, PNG o WebP.');
+                  this.value = '';
+                  return;
+                }
+
+                if (archivo.size > maximo) {
+                  aviso.text('La imagen no puede superar los 2 MB.');
+                  this.value = '';
+                  return;
+                }
+
+                vista.attr('src', URL.createObjectURL(archivo)).removeClass('d-none');
+              });
+            });
+          </script>
+        }

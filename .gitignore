@@ -16,3 +16,5 @@ appsettings.Development.json
 # Sistema operativo
 .DS_Store
 Thumbs.db
+# Archivos subidos por los usuarios (avatares y credenciales)
+wwwroot/uploads/

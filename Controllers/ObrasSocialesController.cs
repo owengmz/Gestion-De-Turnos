@@ -45,6 +45,33 @@ namespace mvc.Controllers
 
       return Json(resultado);
     }
+    // hacemos el metodo Buscar aparte porque Select2 espera un formato distinto al de Listar
+    // GET: /ObrasSociales/Buscar?term=osde&page=1  (formato que espera Select2)
+    [HttpGet]
+    public async Task<IActionResult> Buscar(string? term, int page = 1)
+    {
+      // solo se ofrecen obras sociales activas
+      var consulta = _context.ObrasSociales
+        .AsNoTracking()
+        .Where(o => o.estado);
+
+      if (!string.IsNullOrWhiteSpace(term))
+      {
+        var texto = term.Trim().ToLower();
+        consulta = consulta.Where(o => o.nombre.ToLower().Contains(texto));
+      }
+
+      consulta = consulta.OrderBy(o => o.nombre);
+
+      // paginas de 10 opciones
+      var resultado = await PagedResult<ObraSocial>.CreateAsync(consulta, page, 10);
+
+      return Json(new
+      {
+        results = resultado.Items.Select(o => new { id = o.id, text = o.nombre }),
+        pagination = new { more = resultado.HasNext }
+      });
+    }
 
     // POST: CREATE  (recibe JSON) 
     [HttpPost]

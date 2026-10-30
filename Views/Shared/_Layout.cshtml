@@ -7,12 +7,11 @@
   <title>@ViewData["Title"] - Gestión de Turnos</title>
   <script type="importmap"></script>
   <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+  <link rel="stylesheet" href="~/lib/select2-bootstrap-5-theme/select2-bootstrap-5-theme.min.css" />
   <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
   <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
   <link rel="stylesheet" href="~/Gestion_De_Turnos.styles.css" asp-append-version="true" />
-  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
-  <link rel="stylesheet" href="~/lib/select2-bootstrap-5-theme/select2-bootstrap-5-theme.min.css" />
 </head>
 
 <body class="app-body">
@@ -53,59 +52,67 @@
                 <a class="nav-link" asp-controller="Especialidades" asp-action="Index">Especialidades</a>
               </li>
               <li class="nav-item dropdown">
-                ... (el desplegable de arriba)
-              </li>
-            }
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                   aria-expanded="false">Informes</a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" asp-controller="InformesPacientes" asp-action="PorObraSocial">Pacientes por
+                    obra social</a></li>
+                    <li><a class="dropdown-item" asp-controller="InformesPacientes" asp-action="SinTurnos">Pacientes sin
+                      turnos</a></li>
+                      <li><a class="dropdown-item" asp-controller="InformesPacientes" asp-action="MasTurnos">Pacientes con mas
+                        turnos</a></li>
+                      </ul>
+                    </li>
+                  }
             else if (User.IsInRole("Profesional"))
-            {
-              <li class="nav-item">
-                <a class="nav-link" asp-controller="Turnos" asp-action="Index">Mi agenda</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" asp-controller="Pacientes" asp-action="Index">Pacientes</a>
-              </li>
-            }
-          </ul>
+                  {
+                    <li class="nav-item">
+                      <a class="nav-link" asp-controller="Turnos" asp-action="Index">Mi agenda</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" asp-controller="Pacientes" asp-action="Index">Pacientes</a>
+                    </li>
+                  }
+                </ul>
 
-          <div class="app-account ms-lg-auto">
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-              <a class="app-profile-link" asp-controller="Account" asp-action="Perfil">
-                @if (!string.IsNullOrWhiteSpace(avatarPath))
-                {
-                  <img class="app-avatar" src="@avatarPath" alt="" />
-                }
-                else
-                {
-                  <span class="app-avatar" aria-hidden="true">@(string.IsNullOrWhiteSpace(initials) ? "U" : initials)</span>
-                }
-                <span class="app-account-name">@accountName</span>
-              </a>
-              <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                <button type="submit" class="app-logout">Cerrar sesión</button>
-              </form>
-            }
-            else
-            {
-              <a class="btn app-button-primary px-3" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
-            }
-          </div>
+                <div class="app-account ms-lg-auto">
+                  @if (User.Identity?.IsAuthenticated == true)
+                  {
+                    <a class="app-profile-link" asp-controller="Account" asp-action="Perfil">
+                      @if (!string.IsNullOrWhiteSpace(avatarPath))
+                      {
+                        <img class="app-avatar" src="@avatarPath" alt="" />
+                      }
+                      else
+                      {
+                        <span class="app-avatar" aria-hidden="true">@(string.IsNullOrWhiteSpace(initials) ? "U" : initials)</span>
+                      }
+                      <span class="app-account-name">@accountName</span>
+                    </a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                      <button type="submit" class="app-logout">Cerrar sesión</button>
+                    </form>
+                  }
+                  else
+                  {
+                    <a class="btn app-button-primary px-3" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+                  }
+                </div>
+              </div>
+            </div>
+          </nav>
+        </header>
+        <div class="container app-main">
+          <main role="main">
+            @RenderBody()
+          </main>
         </div>
-      </div>
-    </nav>
-  </header>
-  <div class="container app-main">
-    <main role="main">
-      @RenderBody()
-    </main>
-  </div>
-  <script src="~/lib/jquery/dist/jquery.min.js"></script>
-  <script src="~/lib/select2/js/select2.min.js"></script>
-  <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="~/lib/jquery/dist/jquery.min.js"></script>
-  <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="~/js/site.js" asp-append-version="true"></script>
-  @await RenderSectionAsync("Scripts", required: false)
-</body>
 
-</html>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/select2/js/select2.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        @await RenderSectionAsync("Scripts", required: false)
+      </body>
+
+    </html>

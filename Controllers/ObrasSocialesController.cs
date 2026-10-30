@@ -5,8 +5,8 @@ using mvc.Models;
 
 namespace mvc.Controllers
 {
-  // solo usuarios con sesion iniciada pueden usar este controlador
-  [Authorize]
+  // solo administrador y recepcionista usan este modulo
+  [Authorize(Roles = "Administrador,Recepcionista")]
   public class ObrasSocialesController : Controller
   {
     // acceso a la base de datos, lo entrega el framework

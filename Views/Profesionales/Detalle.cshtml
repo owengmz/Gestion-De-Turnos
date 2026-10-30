@@ -1,0 +1,195 @@
+@model mvc.Models.Profesional
+
+@{
+    ViewData["Title"] = $"Ficha del Profesional: Dr./Dra. {Model.apellido}, {Model.nombre}";
+    var isAdmin = User.IsInRole("Administrador");
+    var iniciales = $"{(!string.IsNullOrEmpty(Model.nombre) ? Model.nombre[0].ToString() : "")}{(!string.IsNullOrEmpty(Model.apellido) ? Model.apellido[0].ToString() : "")}".ToUpper();
+    var countTurnos = Model.Turnos?.Count ?? 0;
+    var countHorarios = Model.HorariosAtencion?.Count ?? 0;
+}
+
+<div class="py-3">
+    <!-- Botón para volver al listado de profesionales -->
+    <div class="mb-3">
+        <a asp-action="Index" class="text-decoration-none text-muted d-inline-flex align-items-center gap-1">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            <span>Volver al listado</span>
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center shadow-sm mb-4" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+            <div>@TempData["SuccessMessage"]</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    <!-- Tarjeta Principal de Perfil -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background: #ffffff;">
+        <div class="card-body p-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                         style="width: 64px; height: 64px; background-color: var(--teal, #216d68); font-size: 1.4rem;">
+                        @iniciales
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                            <h1 class="h4 fw-bold mb-0 text-dark">Dr./Dra. @Model.apellido, @Model.nombre</h1>
+                            @if (Model.estado)
+                            {
+                                <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-1">
+                                    Activo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1">
+                                    Inactivo
+                                </span>
+                            }
+                        </div>
+                        <div class="text-muted d-flex align-items-center gap-2 flex-wrap">
+                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-1 rounded-pill">
+                                @(Model.Especialidad?.nombre ?? "Sin especialidad")
+                            </span>
+                            <span class="small">• Matrícula: <strong class="text-dark">@Model.matricula</strong></span>
+                            <span class="small">• Legajo: <strong class="text-dark">#@Model.id</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                @if (isAdmin)
+                {
+                    <div class="d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.id" class="btn btn-outline-primary px-3 shadow-sm d-inline-flex align-items-center gap-2">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                            </svg>
+                            <span>Editar</span>
+                        </a>
+                        <form asp-action="ToggleEstado" asp-route-id="@Model.id" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Está seguro de que desea @(Model.estado ? "desactivar" : "activar") al profesional @Model.apellido, @Model.nombre?');">
+                            @Html.AntiForgeryToken()
+                            @if (Model.estado)
+                            {
+                                <button type="submit" class="btn btn-outline-warning px-3 shadow-sm">
+                                    Desactivar
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-outline-success px-3 shadow-sm">
+                                    Activar
+                                </button>
+                            }
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Columna 1: Información Detallada -->
+        <div class="col-12 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+                    <h5 class="fw-bold mb-0 text-dark" style="color: var(--teal, #216d68);">Información Profesional y Legal</h5>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">DNI</span>
+                            <span class="fw-semibold text-dark">@Model.dni</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Matrícula Profesional</span>
+                            <span class="fw-semibold text-dark">@Model.matricula</span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Especialidad</span>
+                            <span class="badge bg-light text-dark border px-3 py-1 rounded-pill">
+                                @(Model.Especialidad?.nombre ?? "Sin especialidad")
+                            </span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Descripción Especialidad</span>
+                            <span class="small text-muted text-end" style="max-width: 250px;">
+                                @(Model.Especialidad?.descripcion ?? "Sin descripción cargada")
+                            </span>
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Estado del Registro</span>
+                            <span>@(Model.estado ? "Habilitado para turnos" : "Deshabilitado")</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna 2: Contacto y Actividad -->
+        <div class="col-12 col-md-6">
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+                    <h5 class="fw-bold mb-0 text-dark" style="color: var(--teal, #216d68);">Datos de Contacto</h5>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Correo Electrónico</span>
+                            @if (!string.IsNullOrWhiteSpace(Model.email))
+                            {
+                                <a href="mailto:@Model.email" class="fw-semibold text-decoration-none">@Model.email</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">No especificado</span>
+                            }
+                        </li>
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Teléfono</span>
+                            @if (!string.IsNullOrWhiteSpace(Model.telefono))
+                            {
+                                <a href="tel:@Model.telefono" class="fw-semibold text-decoration-none">@Model.telefono</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">No especificado</span>
+                            }
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Resumen de Actividad -->
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+                    <h5 class="fw-bold mb-0 text-dark" style="color: var(--teal, #216d68);">Métricas de Atención</h5>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    <div class="row g-3 text-center">
+                        <div class="col-6">
+                            <div class="p-3 rounded border bg-light">
+                                <div class="h3 fw-bold text-dark mb-0">@countHorarios</div>
+                                <div class="text-muted small">Franjas de Atención</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded border bg-light">
+                                <div class="h3 fw-bold text-dark mb-0">@countTurnos</div>
+                                <div class="text-muted small">Turnos Registrados</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

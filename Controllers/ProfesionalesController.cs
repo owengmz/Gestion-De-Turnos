@@ -64,6 +64,28 @@ public class ProfesionalesController : Controller
         return View(profesionales);
     }
 
+    // GET: Profesionales/Detalle/5
+    public async Task<IActionResult> Detalle(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var profesional = await _context.Profesionales
+            .Include(p => p.Especialidad)
+            .Include(p => p.HorariosAtencion)
+            .Include(p => p.Turnos)
+            .FirstOrDefaultAsync(p => p.id == id);
+
+        if (profesional == null)
+        {
+            return NotFound();
+        }
+
+        return View(profesional);
+    }
+
     // GET: Profesionales/Create
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Create()
@@ -127,6 +149,116 @@ public class ProfesionalesController : Controller
         await _context.SaveChangesAsync();
 
         TempData["SuccessMessage"] = $"El/La profesional Dr./Dra. {model.apellido}, {model.nombre} fue registrado/a con éxito.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // GET: Profesionales/Edit/5
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var profesional = await _context.Profesionales.FindAsync(id);
+        if (profesional == null)
+        {
+            return NotFound();
+        }
+
+        await CargarComboEspecialidadesAsync(profesional.especialidad_id);
+        return View(profesional);
+    }
+
+    // POST: Profesionales/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> Edit(int id, Profesional model)
+    {
+        if (id != model.id)
+        {
+            return NotFound();
+        }
+
+        // 1. Validar DNI único excluyendo el actual
+        if (!string.IsNullOrWhiteSpace(model.dni))
+        {
+            var dniNormalizado = model.dni.Trim();
+            var dniExiste = await _context.Profesionales
+                .AnyAsync(p => p.id != id && p.dni == dniNormalizado);
+            if (dniExiste)
+            {
+                ModelState.AddModelError("dni", "Ya existe otro profesional registrado con este DNI.");
+            }
+        }
+
+        // 2. Validar Matrícula única excluyendo la actual
+        if (!string.IsNullOrWhiteSpace(model.matricula))
+        {
+            var matNormalizada = model.matricula.Trim().ToLower();
+            var matExiste = await _context.Profesionales
+                .AnyAsync(p => p.id != id && p.matricula.ToLower() == matNormalizada);
+            if (matExiste)
+            {
+                ModelState.AddModelError("matricula", "Ya existe otro profesional registrado con esta matrícula.");
+            }
+        }
+
+        // 3. Validar especialidad existente
+        var especialidadValida = await _context.Especialidades
+            .AnyAsync(e => e.id == model.especialidad_id);
+        if (!especialidadValida)
+        {
+            ModelState.AddModelError("especialidad_id", "Debe seleccionar una especialidad médica válida.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            await CargarComboEspecialidadesAsync(model.especialidad_id);
+            return View(model);
+        }
+
+        var existing = await _context.Profesionales.FindAsync(id);
+        if (existing == null)
+        {
+            return NotFound();
+        }
+
+        existing.nombre = model.nombre.Trim();
+        existing.apellido = model.apellido.Trim();
+        existing.dni = model.dni.Trim();
+        existing.matricula = model.matricula.Trim();
+        existing.telefono = model.telefono?.Trim();
+        existing.email = model.email?.Trim();
+        existing.especialidad_id = model.especialidad_id;
+        existing.estado = model.estado;
+
+        await _context.SaveChangesAsync();
+
+        TempData["SuccessMessage"] = $"Datos del profesional Dr./Dra. {existing.apellido}, {existing.nombre} actualizados con éxito.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // POST: Profesionales/ToggleEstado/5 (Baja Lógica / Reactivación)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Administrador")]
+    public async Task<IActionResult> ToggleEstado(int id)
+    {
+        var profesional = await _context.Profesionales.FindAsync(id);
+        if (profesional == null)
+        {
+            return NotFound();
+        }
+
+        profesional.estado = !profesional.estado;
+        await _context.SaveChangesAsync();
+
+        var estadoTexto = profesional.estado ? "activado/a" : "desactivado/a";
+        TempData["SuccessMessage"] = $"El/La profesional Dr./Dra. {profesional.apellido}, {profesional.nombre} fue {estadoTexto} correctamente.";
+
         return RedirectToAction(nameof(Index));
     }
 

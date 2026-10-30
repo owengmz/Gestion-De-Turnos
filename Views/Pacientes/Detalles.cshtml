@@ -1,0 +1,169 @@
+@model mvc.Models.Paciente
+
+@{
+  ViewData["Title"] = "Detalle del Paciente";
+  var puedeEditar = User.IsInRole("Administrador") || User.IsInRole("Recepcionista");
+}
+
+<div class="py-3">
+  <div class="mb-3">
+    <a asp-action="Index" class="text-decoration-none text-muted">Volver al listado</a>
+  </div>
+
+  <!-- encabezado -->
+  <div
+    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-2 border-bottom">
+    <div>
+      <h1 class="h3 fw-bold mb-1" style="color: var(--teal, #216d68);">@Model.apellido, @Model.nombre</h1>
+      <p class="text-muted mb-0">DNI @Model.dni</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      @if (Model.estado)
+      {
+        <span
+        class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2">Activo</span>
+      }
+      else
+      {
+        <span
+        class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2">Inactivo</span>
+      }
+      @if (puedeEditar)
+      {
+        <a asp-action="Editar" asp-route-id="@Model.id" class="btn app-button-primary px-4">Editar</a>
+      }
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- datos personales y cobertura -->
+    <div class="col-12 col-lg-5">
+      <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; background: #ffffff;">
+        <div class="card-body p-4">
+          <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom"
+              style="font-size: 0.8rem; letter-spacing: 0.05em;">Datos del paciente</h6>
+          <dl class="row mb-0 small">
+            <dt class="col-5 text-muted fw-semibold">Nacimiento</dt>
+            <dd class="col-7">@(Model.fecha_nacimiento.HasValue? Model.fecha_nacimiento.Value.ToString("dd/MM/yyyy") :
+           "-")</dd>
+
+              <dt class="col-5 text-muted fw-semibold">Telefono</dt>
+              <dd class="col-7">@(string.IsNullOrWhiteSpace(Model.telefono) ? "-" : Model.telefono)</dd>
+
+              <dt class="col-5 text-muted fw-semibold">Email</dt>
+              <dd class="col-7 text-break">@(string.IsNullOrWhiteSpace(Model.email) ? "-" : Model.email)</dd>
+
+              <dt class="col-5 text-muted fw-semibold">Direccion</dt>
+              <dd class="col-7 mb-0">@(string.IsNullOrWhiteSpace(Model.direccion) ? "-" : Model.direccion)</dd>
+            </dl>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+          <div class="card-body p-4">
+            <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom"
+                style="font-size: 0.8rem; letter-spacing: 0.05em;">Cobertura</h6>
+            <dl class="row mb-3 small">
+              <dt class="col-5 text-muted fw-semibold">Obra social</dt>
+              <dd class="col-7">
+                @if (Model.ObraSocial != null)
+                {
+                  @Model.ObraSocial.nombre
+                }
+                else
+                {
+                  <span class="text-muted fst-italic">Sin obra social</span>
+                }
+              </dd>
+
+              <dt class="col-5 text-muted fw-semibold">Afiliado</dt>
+              <dd class="col-7 mb-0">@(string.IsNullOrWhiteSpace(Model.numero_afiliado) ? "-" : Model.numero_afiliado)
+              </dd>
+            </dl>
+
+            @if (!string.IsNullOrWhiteSpace(Model.credencial_path))
+            {
+              <img src="@Model.credencial_path" alt="Credencial del paciente" class="img-thumbnail"
+                   style="max-height: 200px;" />
+            }
+            else
+            {
+              <p class="text-muted fst-italic small mb-0">Sin imagen de credencial.</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- turnos -->
+      <div class="col-12 col-lg-7">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+            <h6 class="fw-bold text-secondary text-uppercase mb-0" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+              Turnos (@Model.Turnos.Count)</h6>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead style="background-color: #f1f6f4; border-bottom: 2px solid #dce6e1;">
+                  <tr>
+                    <th class="ps-4 text-secondary text-uppercase fw-semibold"
+                        style="font-size: 0.75rem; letter-spacing: 0.05em;">Fecha</th>
+                    <th class="text-secondary text-uppercase fw-semibold"
+                        style="font-size: 0.75rem; letter-spacing: 0.05em;">Hora</th>
+                    <th class="text-secondary text-uppercase fw-semibold"
+                        style="font-size: 0.75rem; letter-spacing: 0.05em;">Profesional</th>
+                    <th class="text-secondary text-uppercase fw-semibold"
+                        style="font-size: 0.75rem; letter-spacing: 0.05em;">Motivo</th>
+                    <th class="text-secondary text-uppercase fw-semibold text-center"
+                        style="font-size: 0.75rem; letter-spacing: 0.05em;">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (Model.Turnos.Any())
+                  {
+                    foreach (var turno in Model.Turnos)
+                    {
+                      // color del badge segun el texto del estado
+                      var clase = turno.estado switch
+                      {
+                        "Pendiente" => "bg-warning-subtle text-warning-emphasis border-warning-subtle",
+                        "Confirmado" => "bg-primary-subtle text-primary border-primary-subtle",
+                        "Atendido" => "bg-success-subtle text-success border-success-subtle",
+                        "Cancelado" => "bg-danger-subtle text-danger border-danger-subtle",
+                        _ => "bg-secondary-subtle text-secondary border-secondary-subtle"
+                      };
+
+                      <tr>
+                        <td class="ps-4 fw-semibold text-muted">@turno.fecha.ToString("dd/MM/yyyy")</td>
+                        <td class="text-muted">@turno.hora.ToString("HH:mm")</td>
+                        <td>
+                          @if (turno.Profesional != null)
+                          {
+                            <span class="text-dark">@turno.Profesional.apellido, @turno.Profesional.nombre</span>
+                          }
+                          else
+                          {
+                            <span class="text-muted">-</span>
+                          }
+                        </td>
+                        <td class="text-muted">@(string.IsNullOrWhiteSpace(turno.motivo) ? "-" : turno.motivo)</td>
+                        <td class="text-center">
+                          <span class="badge rounded-pill border px-3 py-1 @clase">@turno.estado</span>
+                        </td>
+                      </tr>
+                    }
+                  }
+                  else
+                  {
+                    <tr>
+                      <td colspan="5" class="text-center py-5">
+                        <p class="h6 fw-normal mb-1 text-muted">Este paciente no tiene turnos</p>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

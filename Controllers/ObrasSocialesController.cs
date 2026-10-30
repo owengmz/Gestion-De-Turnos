@@ -41,7 +41,7 @@ namespace mvc.Controllers
       consulta = consulta.OrderBy(o => o.nombre);
 
       // trae solo la pagina pedida y el total
-      var resultado = await PagedResult<ObraSocial>.CreateAsync(consulta, page, pageSize);
+      var resultado = await ResultadoPaginado<ObraSocial>.CrearAsync(consulta, page, pageSize);
 
       return Json(resultado);
     }
@@ -64,12 +64,12 @@ namespace mvc.Controllers
       consulta = consulta.OrderBy(o => o.nombre);
 
       // paginas de 10 opciones
-      var resultado = await PagedResult<ObraSocial>.CreateAsync(consulta, page, 10);
+      var resultado = await ResultadoPaginado<ObraSocial>.CrearAsync(consulta, page, 10);
 
       return Json(new
       {
-        results = resultado.Items.Select(o => new { id = o.id, text = o.nombre }),
-        pagination = new { more = resultado.HasNext }
+        results = resultado.Registros.Select(o => new { id = o.id, text = o.nombre }),
+        pagination = new { more = resultado.TienePaginaSiguiente }
       });
     }
 
@@ -104,7 +104,7 @@ namespace mvc.Controllers
       return Json(new { ok = true, id = obra.id, mensaje = "Obra social creada" });
     }
 
-    // POST: EDIT (recibe JSON con el id)
+    // POST: EDITAR (recibe JSON con el id)
     [HttpPost]
     public async Task<IActionResult> Editar([FromBody] ObraSocial modelo)
     {

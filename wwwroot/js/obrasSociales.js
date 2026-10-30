@@ -5,14 +5,14 @@ createApp({
   // estado de la pagina
   data() {
     return {
-      items: [],
+      registros: [],
       buscar: '',
-      page: 1,
-      pageSize: 10,
-      totalItems: 0,
-      totalPages: 0,
-      hasPrevious: false,
-      hasNext: false,
+      pagina: 1,
+      registrosPorPagina: 3,
+      totalRegistros: 0,
+      totalPaginas: 0,
+      tienePaginaAnterior: false,
+      tienePaginaSiguiente: false,
       cargando: false,
       error: '',
       mensajeOk: '',
@@ -41,8 +41,8 @@ createApp({
       try {
         const params = new URLSearchParams({
           buscar: this.buscar,
-          page: this.page,
-          pageSize: this.pageSize
+          pagina: this.pagina,
+          registrosPorPagina: this.registrosPorPagina
         });
 
         const resp = await fetch('/ObrasSociales/Listar?' + params.toString());
@@ -50,13 +50,13 @@ createApp({
           throw new Error('No se pudo cargar el listado');
         }
 
-        const data = await resp.json();
-        this.items = data.items;
-        this.page = data.page;
-        this.totalItems = data.totalItems;
-        this.totalPages = data.totalPages;
-        this.hasPrevious = data.hasPrevious;
-        this.hasNext = data.hasNext;
+        const datos = await resp.json();
+        this.registros = datos.registros;
+        this.pagina = datos.pagina;
+        this.totalRegistros = datos.totalRegistros;
+        this.totalPaginas = datos.totalPaginas;
+        this.tienePaginaAnterior = datos.tienePaginaAnterior;
+        this.tienePaginaSiguiente = datos.tienePaginaSiguiente;
       } catch (e) {
         this.error = e.message;
       } finally {
@@ -68,17 +68,17 @@ createApp({
     buscarConRetraso() {
       clearTimeout(this.temporizador);
       this.temporizador = setTimeout(() => {
-        this.page = 1;
+        this.pagina = 1;
         this.cargar();
       }, 300);
     },
 
     // cambia de pagina si esta dentro del rango
     irAPagina(n) {
-      if (n < 1 || n > this.totalPages) {
+      if (n < 1 || n > this.totalPaginas) {
         return;
       }
-      this.page = n;
+      this.pagina = n;
       this.cargar();
     },
 
@@ -92,18 +92,18 @@ createApp({
 
       const resp = await fetch(url, opciones);
 
-      let data = null;
+      let respuesta = null;
       try {
-        data = await resp.json();
+        respuesta = await resp.json();
       } catch (e) {
-        data = null;
+        respuesta = null;
       }
 
       // sin JSON: sesion vencida o sin permisos (el servidor redirige)
-      if (!data) {
+      if (!respuesta) {
         return { ok: false, mensaje: 'No se pudo completar la operacion (sesion vencida o sin permisos)' };
       }
-      return data;
+      return respuesta;
     },
 
     // muestra un aviso de exito unos segundos
@@ -194,8 +194,8 @@ createApp({
       }
 
       // si era el unico registro de la pagina, volvemos a la anterior
-      if (this.items.length === 1 && this.page > 1) {
-        this.page--;
+      if (this.registros.length === 1 && this.pagina > 1) {
+        this.pagina--;
       }
 
       this.mostrarOk(r.mensaje);

@@ -54,7 +54,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="o in items" :key="o.id" :class="{ 'table-light opacity-75': !o.estado }">
+          <tr v-for="o in registros" :key="o.id" :class="{ 'table-light opacity-75': !o.estado }">
             <td class="ps-4 fw-semibold text-muted">#{{ o.id }}</td>
             <td><span class="fw-bold text-dark">{{ o.nombre }}</span></td>
             <td>
@@ -76,7 +76,7 @@
               </div>
             </td>
           </tr>
-          <tr v-if="!cargando && items.length === 0">
+          <tr v-if="!cargando && registros.length === 0">
             <td colspan="5" class="text-center py-5">
               <p class="h6 fw-normal mb-1 text-muted">No se encontraron obras sociales</p>
               <small class="text-muted">Proba cambiando la busqueda o agregando una nueva obra social.</small>
@@ -89,13 +89,13 @@
     <!-- paginado -->
     <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
       <small class="text-muted">
-        {{ totalItems }} registros - pagina {{ page }} de {{ totalPages || 1 }}
+        {{ totalRegistros }} registros - pagina {{ pagina }} de {{ totalPaginas || 1 }}
       </small>
       <div>
-        <button class="btn btn-outline-secondary btn-sm me-1" :disabled="!hasPrevious"
-                v-on:click="irAPagina(page - 1)">Anterior</button>
-        <button class="btn btn-outline-secondary btn-sm" :disabled="!hasNext"
-                v-on:click="irAPagina(page + 1)">Siguiente</button>
+        <button class="btn btn-outline-secondary btn-sm me-1" :disabled="!tienePaginaAnterior"
+                v-on:click="irAPagina(pagina - 1)">Anterior</button>
+        <button class="btn btn-outline-secondary btn-sm" :disabled="!tienePaginaSiguiente"
+                v-on:click="irAPagina(pagina + 1)">Siguiente</button>
       </div>
     </div>
   </div>

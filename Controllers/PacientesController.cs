@@ -328,7 +328,10 @@ namespace mvc.Controllers
       var paciente = await _context.Pacientes
         .AsNoTracking()
         .Include(p => p.ObraSocial)
-        .Include(p => p.Turnos)
+        .Include(p => p.Turnos
+          .OrderByDescending(t => t.fecha)
+          .ThenByDescending(t => t.hora))
+          .ThenInclude(t => t.Profesional)
         .FirstOrDefaultAsync(p => p.id == id);
 
       if (paciente == null)

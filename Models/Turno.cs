@@ -46,10 +46,10 @@ namespace mvc.Models
         [ForeignKey("usuario_modificador_id")]
         public Usuario? UsuarioModificador { get; set; }        
             
-        [Column("fecha_creacion")]
+        [Column("fecha_creacion", TypeName = "timestamp without time zone")]
         public DateTime fecha_creacion { get; set; }
 
-        [Column("fecha_modificacion")]
+        [Column("fecha_modificacion", TypeName = "timestamp without time zone")]
         public DateTime? fecha_modificacion { get; set; }
     }
 }

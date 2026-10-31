@@ -132,7 +132,8 @@ namespace mvc.Controllers
         // Registrar auditoría
         turno.usuario_creador_id = usuarioId;
         turno.usuario_modificador_id = null;
-        turno.fecha_creacion = DateTime.Now;
+        turno.fecha_creacion = DateTime.SpecifyKind(
+        DateTime.Now, DateTimeKind.Unspecified);
         turno.fecha_modificacion = null;
         turno.estado = "Pendiente";
 

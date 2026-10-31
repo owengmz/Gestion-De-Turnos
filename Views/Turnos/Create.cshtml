@@ -57,3 +57,51 @@
         </a>
     </form>
 </div>
+
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#paciente_id').select2({
+                placeholder: 'Buscar paciente...',
+                allowClear: true,
+                minimumInputLength: 2,
+                ajax: {
+                    url: '@Url.Action("BuscarPacientes", "Turnos")',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return data;
+                    }
+                }
+            });
+
+            $('#profesional_id').select2({
+                placeholder: 'Buscar profesional...',
+                allowClear: true,
+                minimumInputLength: 2,
+                ajax: {
+                    url: '@Url.Action("BuscarProfesionales", "Turnos")',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return data;
+                    }
+                }
+            });
+
+        });
+    </script>
+}
+

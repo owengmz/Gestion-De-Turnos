@@ -23,9 +23,9 @@ namespace mvc.Controllers
     {
       return View();
     }
-    // GET: /ObrasSociales/Listar?buscar=osde&page=1&pageSize=10
+    // GET: /ObrasSociales/Listar?buscar=osde&pagina=1&registrosPorPagina=10
     [HttpGet]
-    public async Task<IActionResult> Listar(string? buscar, int page = 1, int pageSize = 10)
+    public async Task<IActionResult> Listar(string? buscar, int pagina = 1, int registrosPorPagina = 10)
     {
       // consulta armada pero todavia no ejecutada
       var consulta = _context.ObrasSociales.AsNoTracking().AsQueryable();
@@ -41,7 +41,7 @@ namespace mvc.Controllers
       consulta = consulta.OrderBy(o => o.nombre);
 
       // trae solo la pagina pedida y el total
-      var resultado = await ResultadoPaginado<ObraSocial>.CrearAsync(consulta, page, pageSize);
+      var resultado = await ResultadoPaginado<ObraSocial>.CrearAsync(consulta, pagina, registrosPorPagina);
 
       return Json(resultado);
     }

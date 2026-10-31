@@ -1,0 +1,59 @@
+
+@model mvc.Models.Turno
+
+@{
+    ViewData["Title"] = "Nuevo Turno";
+}
+
+<div class="container mt-4">
+    <h2>Registrar Nuevo Turno</h2>
+
+    <form asp-action="Create" method="post">
+
+        <div class="mb-3">
+            <label class="form-label">Paciente</label>
+            <select id="paciente_id"
+                    name="paciente_id"
+                    class="form-select">
+                <option value="">Buscar paciente...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Profesional</label>
+            <select id="profesional_id"
+                    name="profesional_id"
+                    class="form-select">
+                <option value="">Buscar profesional...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="fecha" class="form-label">Fecha</label>
+            <input asp-for="fecha"
+                   type="date"
+                   class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="hora" class="form-label">Hora</label>
+            <input asp-for="hora"
+                   type="time"
+                   class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="motivo" class="form-label">Motivo</label>
+            <textarea asp-for="motivo"
+                      class="form-control"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Guardar Turno
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+</div>

@@ -35,41 +35,14 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<CredencialStorageService>();
 
 var app = builder.Build();
-// Si no hay usuarios, creamos el primer administrador
+// siembra de usuarios por rol
 using (var scope = app.Services.CreateScope())
 {
   var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
   var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<Usuario>>();
-
-  if (!db.Usuarios.Any())
-  {
-    const string emailAdmin = "admin@admin.com";
-    const string claveAdmin = "admin123";
-
-    var admin = new Usuario
-    {
-      nombre = "Admin",
-      apellido = "Sistema",
-      email = emailAdmin,
-      rol = Rol.Administrador,
-      activo = true
-    };
-    admin.password_hash = hasher.HashPassword(admin, claveAdmin);
-
-    db.Usuarios.Add(admin);
-    db.SaveChanges();
-
-    // Mostramos las credenciales en consola (solo desarrollo)
-    if (app.Environment.IsDevelopment())
-    {
-      Console.WriteLine("========================================");
-      Console.WriteLine("  Primer administrador creado");
-      Console.WriteLine($"  Email: {emailAdmin}");
-      Console.WriteLine($"  Clave: {claveAdmin}");
-      Console.WriteLine("========================================");
-    }
-  }
+  UsuariosDePrueba.Sembrar(db, hasher);
 }
+
 using (var scope = app.Services.CreateScope())
 {
   var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

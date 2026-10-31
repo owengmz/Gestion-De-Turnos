@@ -11,10 +11,13 @@ namespace mvc.Controllers
   [Authorize]
   public class PacientesController : Controller
   {
+    // registros por pagina del listado SOLO PRUEBA
+    private const int RegistrosPorPagina = 3;
     // campos que acepta el formulario (credencial_path nunca viene del cliente)
     private const string CamposCrear =
       "dni,nombre,apellido,fecha_nacimiento,telefono,email,direccion,numero_afiliado,obra_social_id,estado";
     private const string CamposEditar = "id," + CamposCrear;
+
 
     // acceso a la base de datos, lo entrega el framework
     private readonly AppDbContext _context;
@@ -61,7 +64,7 @@ namespace mvc.Controllers
       consulta = consulta.OrderBy(p => p.apellido).ThenBy(p => p.nombre);
 
       // trae solo la pagina pedida y el total
-      var resultado = await ResultadoPaginado<Paciente>.CrearAsync(consulta, pagina, 10);
+      var resultado = await ResultadoPaginado<Paciente>.CrearAsync(consulta, pagina, RegistrosPorPagina);
 
       // datos para mantener los filtros en la vista
       ViewBag.Buscar = buscar;

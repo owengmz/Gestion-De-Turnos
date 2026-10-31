@@ -9,7 +9,7 @@ namespace mvc.Controllers
   [Authorize(Roles = "Administrador,Recepcionista")]
   public class InformesPacientesController : Controller
   {
-    private const int RegistrosPorPagina = 10;
+    private const int RegistrosPorPagina = 3;
 
     // acceso a la base de datos, lo entrega el framework
     private readonly AppDbContext _context;

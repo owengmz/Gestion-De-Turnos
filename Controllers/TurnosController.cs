@@ -16,35 +16,40 @@ namespace mvc.Controllers
         {
             _context = context;
         }
+        
+       
+    public async Task<IActionResult> Index(int pagina = 1)
+    {
+        int registrosPorPagina = 10;
 
-        public async Task<IActionResult> Index()
-        {
-            var query = _context.Turnos.AsQueryable();
+        var consulta = _context.Turnos
+            .Include(t => t.Paciente)
+            .Include(t => t.Profesional)
+            .OrderBy(t => t.fecha)
+            .ThenBy(t => t.hora);
 
-            if (User.IsInRole(Rol.Profesional.ToString()))
-            {
-                var professionalIdValue = User.FindFirstValue("ProfesionalId");
-                if (!int.TryParse(professionalIdValue, out var professionalId))
-                {
-                    return Forbid();
-                }
+        int totalRegistros = await consulta.CountAsync();
 
-                query = query.Where(turno => turno.profesional_id == professionalId);
-            }
-            else if (!User.IsInRole(Rol.Administrador.ToString())
-                && !User.IsInRole(Rol.Recepcionista.ToString()))
-            {
-                return Forbid();
-            }
+        int totalPaginas = (int)Math.Ceiling(
+            (double)totalRegistros / registrosPorPagina
+        );
 
-            var turnos = await query
-                .Include(t => t.Paciente)
-                .Include(t => t.Profesional)
-                .OrderBy(t => t.fecha)
-                .ThenBy(t => t.hora)
-                .ToListAsync();
+        var turnos = await consulta
+            .Skip((pagina - 1) * registrosPorPagina)
+            .Take(registrosPorPagina)
+            .ToListAsync();
 
-            return View(turnos);
-        }
+        ViewBag.PaginaActual = pagina;
+        ViewBag.TotalPaginas = totalPaginas;
+
+        return View(turnos);
+    }
+   
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View();
+    }
+
     }
 }

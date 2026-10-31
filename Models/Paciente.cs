@@ -22,6 +22,8 @@ namespace mvc.Models
         [StringLength(100)]
         public string apellido { get; set; } = string.Empty;
 
+        public bool estado { get; set; } = true;
+
         public ICollection<Turno> Turnos { get; set; } = new List<Turno>();
     }
 }

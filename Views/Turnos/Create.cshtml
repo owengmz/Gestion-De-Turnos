@@ -9,6 +9,7 @@
     <h2>Registrar Nuevo Turno</h2>
 
     <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
         <div class="mb-3">
             <label class="form-label">Paciente</label>
@@ -17,6 +18,7 @@
                     class="form-select">
                 <option value="">Buscar paciente...</option>
             </select>
+            <span asp-validation-for="paciente_id" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
@@ -26,6 +28,7 @@
                     class="form-select">
                 <option value="">Buscar profesional...</option>
             </select>
+            <span asp-validation-for="profesional_id" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
@@ -33,6 +36,7 @@
             <input asp-for="fecha"
                    type="date"
                    class="form-control" />
+            <span asp-validation-for="fecha" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
@@ -40,12 +44,14 @@
             <input asp-for="hora"
                    type="time"
                    class="form-control" />
+            <span asp-validation-for="hora" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="motivo" class="form-label">Motivo</label>
             <textarea asp-for="motivo"
                       class="form-control"></textarea>
+            <span asp-validation-for="motivo" class="text-danger"></span>
         </div>
 
         <button type="submit" class="btn btn-primary">

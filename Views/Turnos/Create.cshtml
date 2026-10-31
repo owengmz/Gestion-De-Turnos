@@ -1,0 +1,107 @@
+
+@model mvc.Models.Turno
+
+@{
+    ViewData["Title"] = "Nuevo Turno";
+}
+
+<div class="container mt-4">
+    <h2>Registrar Nuevo Turno</h2>
+
+    <form asp-action="Create" method="post">
+
+        <div class="mb-3">
+            <label class="form-label">Paciente</label>
+            <select id="paciente_id"
+                    name="paciente_id"
+                    class="form-select">
+                <option value="">Buscar paciente...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Profesional</label>
+            <select id="profesional_id"
+                    name="profesional_id"
+                    class="form-select">
+                <option value="">Buscar profesional...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="fecha" class="form-label">Fecha</label>
+            <input asp-for="fecha"
+                   type="date"
+                   class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="hora" class="form-label">Hora</label>
+            <input asp-for="hora"
+                   type="time"
+                   class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="motivo" class="form-label">Motivo</label>
+            <textarea asp-for="motivo"
+                      class="form-control"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Guardar Turno
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+</div>
+
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#paciente_id').select2({
+                placeholder: 'Buscar paciente...',
+                allowClear: true,
+                minimumInputLength: 2,
+                ajax: {
+                    url: '@Url.Action("BuscarPacientes", "Turnos")',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return data;
+                    }
+                }
+            });
+
+            $('#profesional_id').select2({
+                placeholder: 'Buscar profesional...',
+                allowClear: true,
+                minimumInputLength: 2,
+                ajax: {
+                    url: '@Url.Action("BuscarProfesionales", "Turnos")',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return data;
+                    }
+                }
+            });
+
+        });
+    </script>
+}
+

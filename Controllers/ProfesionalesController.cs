@@ -16,8 +16,10 @@ public class ProfesionalesController : Controller
         _context = context;
     }
 
+    private const int RegistrosPorPagina = 5;
+
     // GET: Profesionales
-    public async Task<IActionResult> Index(string? search, int? especialidadId, string? estadoFiltro)
+    public async Task<IActionResult> Index(string? search, int? especialidadId, string? estadoFiltro, int pagina = 1)
     {
         var query = _context.Profesionales
             .Include(p => p.Especialidad)
@@ -47,10 +49,11 @@ public class ProfesionalesController : Controller
             query = query.Where(p => !p.estado);
         }
 
-        var profesionales = await query
+        query = query
             .OrderBy(p => p.apellido)
-            .ThenBy(p => p.nombre)
-            .ToListAsync();
+            .ThenBy(p => p.nombre);
+
+        var resultado = await ResultadoPaginado<Profesional>.CrearAsync(query, pagina, RegistrosPorPagina);
 
         var especialidades = await _context.Especialidades
             .OrderBy(e => e.nombre)
@@ -61,7 +64,7 @@ public class ProfesionalesController : Controller
         ViewBag.EspecialidadId = especialidadId;
         ViewBag.EstadoFiltro = estadoFiltro ?? "todos";
 
-        return View(profesionales);
+        return View(resultado);
     }
 
     // GET: Profesionales/Detalle/5
@@ -260,6 +263,54 @@ public class ProfesionalesController : Controller
         TempData["SuccessMessage"] = $"El/La profesional Dr./Dra. {profesional.apellido}, {profesional.nombre} fue {estadoTexto} correctamente.";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    // GET: /Profesionales/BuscarAsync?q=
+    // Endpoint AJAX para componente Select2
+    [HttpGet]
+    public async Task<IActionResult> BuscarAsync(string? q, string? term, int? especialidadId)
+    {
+        var busqueda = (q ?? term)?.Trim().ToLower();
+
+        var query = _context.Profesionales
+            .AsNoTracking()
+            .Include(p => p.Especialidad)
+            .Where(p => p.estado); // Solo profesionales habilitados para turnos
+
+        if (especialidadId.HasValue && especialidadId.Value > 0)
+        {
+            query = query.Where(p => p.especialidad_id == especialidadId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(busqueda))
+        {
+            query = query.Where(p =>
+                p.nombre.ToLower().Contains(busqueda) ||
+                p.apellido.ToLower().Contains(busqueda) ||
+                p.dni.Contains(busqueda) ||
+                p.matricula.ToLower().Contains(busqueda) ||
+                (p.Especialidad != null && p.Especialidad.nombre.ToLower().Contains(busqueda)));
+        }
+
+        var resultados = await query
+            .OrderBy(p => p.apellido)
+            .ThenBy(p => p.nombre)
+            .Take(15)
+            .Select(p => new
+            {
+                id = p.id,
+                text = $"{p.apellido}, {p.nombre} ({(p.Especialidad != null ? p.Especialidad.nombre : "Sin esp.")} - Mat. {p.matricula})"
+            })
+            .ToListAsync();
+
+        return Json(new { results = resultados });
+    }
+
+    // GET: /Profesionales/Buscar (Alias de compatibilidad para Select2)
+    [HttpGet]
+    public async Task<IActionResult> Buscar(string? q, string? term, int? especialidadId)
+    {
+        return await BuscarAsync(q, term, especialidadId);
     }
 
     private async Task CargarComboEspecialidadesAsync(int? seleccionado = null)

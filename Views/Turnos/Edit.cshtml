@@ -1,0 +1,146 @@
+
+@model mvc.Models.Turno
+
+@{
+    ViewData["Title"] = "Modificar Turno";
+}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold mb-3">Modificar Turno</h2>
+
+    <p class="text-muted">
+        Modifica los datos del turno seleccionado.
+    </p>
+
+    <form asp-action="Edit" method="post">
+
+        <input type="hidden" asp-for="id" />
+
+        <div asp-validation-summary="All"
+             class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label class="form-label">Paciente</label>
+
+            <select id="paciente_id"
+                    name="paciente_id"
+                    class="form-select"
+                    style="width: 100%;">
+
+                @if (Model.Paciente != null)
+                {
+                    <option value="@Model.paciente_id" selected>
+                        @Model.Paciente.nombre @Model.Paciente.apellido
+                    </option>
+                }
+            </select>
+
+            <span asp-validation-for="paciente_id"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Profesional</label>
+
+            <select id="profesional_id"
+                    name="profesional_id"
+                    class="form-select"
+                    style="width: 100%;">
+
+                @if (Model.Profesional != null)
+                {
+                    <option value="@Model.profesional_id" selected>
+                        @Model.Profesional.nombre @Model.Profesional.apellido
+                    </option>
+                }
+            </select>
+
+            <span asp-validation-for="profesional_id"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="fecha" class="form-label">Fecha</label>
+
+            <input asp-for="fecha"
+                   type="date"
+                   class="form-control" />
+
+            <span asp-validation-for="fecha"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="hora" class="form-label">Hora</label>
+
+            <input asp-for="hora"
+                   type="time"
+                   class="form-control" />
+
+            <span asp-validation-for="hora"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="motivo" class="form-label">Motivo</label>
+
+            <textarea asp-for="motivo"
+                      class="form-control"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Guardar Cambios
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+
+    </form>
+</div>
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#paciente_id').select2({
+                placeholder: 'Buscar paciente...',
+                allowClear: true,
+                minimumInputLength: 2,
+                ajax: {
+                    url: '@Url.Action("BuscarPacientes", "Turnos")',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return data;
+                    }
+                }
+            });
+
+            $('#profesional_id').select2({
+                placeholder: 'Buscar profesional...',
+                allowClear: true,
+                minimumInputLength: 2,
+                ajax: {
+                    url: '@Url.Action("BuscarProfesionales", "Turnos")',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return { term: params.term };
+                    },
+                    processResults: function (data) {
+                        return data;
+                    }
+                }
+            });
+
+        });
+    </script>
+}

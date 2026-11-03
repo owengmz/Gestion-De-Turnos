@@ -36,6 +36,7 @@
                 <th>Profesional</th>
                 <th>Motivo</th>
                 <th>Estado</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -56,6 +57,15 @@
                     </td>
                     <td>@turno.motivo</td>
                     <td>@turno.estado</td>
+                    <td>
+                        <a asp-controller="Turnos"
+                        asp-action="Edit"
+                        asp-route-id="@turno.id"
+                        class="btn btn-sm text-white"
+                        style="background-color: #2f706b; border-radius: 6px;">
+                            Editar
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>

@@ -145,7 +145,146 @@ namespace mvc.Controllers
         return RedirectToAction(nameof(Index));
     }
 
-   
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var turno = await _context.Turnos
+            .Include(t => t.Paciente)
+            .Include(t => t.Profesional)
+            .FirstOrDefaultAsync(t => t.id == id);
+
+        if (turno == null)
+            return NotFound();
+
+        return View(turno);
+    }
+
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Turno modelo)
+    {
+        if (id != modelo.id)
+            return NotFound();
+
+        var turno = await _context.Turnos
+            .FirstOrDefaultAsync(t => t.id == id);
+
+        if (turno == null)
+            return NotFound();
+
+        // Identificar usuario autenticado
+        var usuarioIdTexto = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!int.TryParse(usuarioIdTexto, out int usuarioId))
+            return Forbid();
+
+        // Validar paciente
+        var paciente = await _context.Pacientes
+            .FirstOrDefaultAsync(p =>
+                p.id == modelo.paciente_id && p.estado);
+
+        if (paciente == null)
+            ModelState.AddModelError("paciente_id",
+                "El paciente no existe o está inactivo.");
+
+        // Validar profesional
+        var profesional = await _context.Profesionales
+            .FirstOrDefaultAsync(p =>
+                p.id == modelo.profesional_id && p.estado);
+
+        if (profesional == null)
+            ModelState.AddModelError("profesional_id",
+                "El profesional no existe o está inactivo.");
+
+        // Validar fecha
+        if (modelo.fecha < DateOnly.FromDateTime(DateTime.Today))
+            ModelState.AddModelError("fecha",
+                "No se pueden asignar turnos en fechas pasadas.");
+
+        // Validar horario de atención
+        if (profesional != null)
+        {
+            string diaSemana = modelo.fecha.DayOfWeek switch
+            {
+                DayOfWeek.Monday => "Lunes",
+                DayOfWeek.Tuesday => "Martes",
+                DayOfWeek.Wednesday => "Miercoles",
+                DayOfWeek.Thursday => "Jueves",
+                DayOfWeek.Friday => "Viernes",
+                DayOfWeek.Saturday => "Sabado",
+                DayOfWeek.Sunday => "Domingo",
+                _ => ""
+            };
+
+            bool dentroHorario = await _context.HorariosAtencion.AnyAsync(h =>
+                h.profesional_id == modelo.profesional_id &&
+                h.estado &&
+                h.dia_semana == diaSemana &&
+                modelo.hora >= h.hora_desde &&
+                modelo.hora < h.hora_hasta);
+
+            if (!dentroHorario)
+                ModelState.AddModelError("hora",
+                    "El profesional no atiende en ese día u horario.");
+        }
+
+        // Comprobar disponibilidad del profesional
+        bool profesionalOcupado = await _context.Turnos.AnyAsync(t =>
+            t.id != id &&
+            t.profesional_id == modelo.profesional_id &&
+            t.fecha == modelo.fecha &&
+            t.hora == modelo.hora &&
+            t.estado != "Cancelado");
+
+        if (profesionalOcupado)
+            ModelState.AddModelError("hora",
+                "El profesional ya tiene otro turno en ese horario.");
+
+        // Comprobar disponibilidad del paciente
+        bool pacienteOcupado = await _context.Turnos.AnyAsync(t =>
+            t.id != id &&
+            t.paciente_id == modelo.paciente_id &&
+            t.fecha == modelo.fecha &&
+            t.hora == modelo.hora &&
+            t.estado != "Cancelado");
+
+        if (pacienteOcupado)
+            ModelState.AddModelError("hora",
+                "El paciente ya tiene otro turno en ese horario.");
+
+        // Si hay errores, volver al formulario
+        if (!ModelState.IsValid)
+        {
+            modelo.Paciente = await _context.Pacientes
+                .FindAsync(modelo.paciente_id);
+
+            modelo.Profesional = await _context.Profesionales
+                .FindAsync(modelo.profesional_id);
+
+            return View(modelo);
+        }
+
+        // Actualizar solamente los campos permitidos
+        turno.paciente_id = modelo.paciente_id;
+        turno.profesional_id = modelo.profesional_id;
+        turno.fecha = modelo.fecha;
+        turno.hora = modelo.hora;
+        turno.motivo = modelo.motivo;
+
+        // Registrar auditoría
+        turno.usuario_modificador_id = usuarioId;
+        turno.fecha_modificacion = DateTime.SpecifyKind(
+            DateTime.Now, DateTimeKind.Unspecified);
+
+        await _context.SaveChangesAsync();
+
+        TempData["Mensaje"] = "Turno modificado correctamente.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+
     [HttpGet]
     public async Task<IActionResult> BuscarPacientes(string term)
     {

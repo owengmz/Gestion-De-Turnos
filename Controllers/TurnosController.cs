@@ -129,7 +129,7 @@ namespace mvc.Controllers
         if (!ModelState.IsValid)
             return View(turno);
 
-        // Registrar auditoría
+        // Registrar auditoria
         turno.usuario_creador_id = usuarioId;
         turno.usuario_modificador_id = null;
         turno.fecha_creacion = DateTime.SpecifyKind(

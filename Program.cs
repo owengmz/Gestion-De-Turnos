@@ -1,6 +1,9 @@
+using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using mvc.Models;
 using mvc.Services;
 
@@ -15,9 +18,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 builder.Services.AddScoped<AvatarStorageService>();
+builder.Services.AddScoped<CredencialStorageService>();
+
+// Configuracion de autenticacion dual: Cookies (para la web MVC) y JWT Bearer (para la Web API)
 builder.Services
-    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+    .AddAuthentication(options =>
+    {
+      options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+      options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
       options.LoginPath = "/Account/Login";
       options.AccessDeniedPath = "/Account/AccessDenied";
@@ -29,10 +39,27 @@ builder.Services
       options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
           ? CookieSecurePolicy.SameAsRequest
           : CookieSecurePolicy.Always;
+    })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+      var jwtKey = builder.Configuration["Jwt:Key"] ?? "ClaveSecretaSuperSeguraParaCentroMedicoTurnos2026!*";
+      options.RequireHttpsMetadata = false;
+      options.SaveToken = true;
+      options.TokenValidationParameters = new TokenValidationParameters
+      {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "GestionDeTurnosAPI",
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "GestionDeTurnosClients",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ClockSkew = TimeSpan.Zero
+      };
     });
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<CredencialStorageService>();
 
 var app = builder.Build();
 // siembra de usuarios por rol

@@ -16,7 +16,7 @@ public class ProfesionalesController : Controller
         _context = context;
     }
 
-    private const int RegistrosPorPagina = 5;
+    private const int RegistrosPorPagina = 3;
 
     // GET: Profesionales
     public async Task<IActionResult> Index(string? search, int? especialidadId, string? estadoFiltro, int pagina = 1)

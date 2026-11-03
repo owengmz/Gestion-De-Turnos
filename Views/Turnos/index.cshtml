@@ -2,13 +2,30 @@
 @model IEnumerable<mvc.Models.Turno>
 
 @{
-    ViewData["Title"] = "Gestión de Turnos";
+    ViewData["Title"] = "Gestion de Turnos";
 }
 
-<div class="container mt-4">
-    <h2>Gestión de Turnos</h2>
 
-    <p>Listado de turnos médicos registrados.</p>
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+
+        <div>
+            <h2 class="fw-bold mb-1">Turnos</h2>
+            <p class="text-muted mb-0">
+                Gestion y consulta de los turnos medicos registrados.
+            </p>
+        </div>
+
+        <a asp-controller="Turnos"
+           asp-action="Create"
+           class="btn text-white px-4 py-3"
+           style="background-color: #2f706b; border-radius: 8px; min-width: 140px;">
+            <strong>Crear Turno</strong>
+        </a>
+
+    </div>
+
 
     <table class="table table-striped table-bordered">
         <thead>

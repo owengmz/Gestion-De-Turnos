@@ -5,6 +5,8 @@
     var currentSearch = ViewBag.Search as string;
     var currentRol = ViewBag.RolFiltro as mvc.Models.Rol?;
     var currentFilter = ViewBag.EstadoFiltro as string ?? "todos";
+    var currentUserIdText = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    int.TryParse(currentUserIdText, out int currentUserId);
 }
 
 <div class="py-3">
@@ -15,6 +17,17 @@
                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
             </svg>
             <div>@TempData["SuccessMessage"]</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center shadow-sm mb-4" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            <div>@TempData["ErrorMessage"]</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
     }
@@ -94,7 +107,8 @@
                         <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Rol</th>
                         <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Profesional Vinculado</th>
                         <th class="text-secondary text-uppercase fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.05em;">Último Acceso</th>
-                        <th class="pe-4 text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; letter-spacing: 0.05em; width: 120px;">Estado</th>
+                        <th class="text-secondary text-uppercase fw-semibold text-center" style="font-size: 0.75rem; letter-spacing: 0.05em; width: 110px;">Estado</th>
+                        <th class="pe-4 text-secondary text-uppercase fw-semibold text-end" style="font-size: 0.75rem; letter-spacing: 0.05em; width: 140px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -169,7 +183,7 @@
                                         <span class="text-muted small fst-italic">Nunca ingresó</span>
                                     }
                                 </td>
-                                <td class="pe-4 text-center">
+                                <td class="text-center">
                                     @if (item.activo)
                                     {
                                         <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-1">
@@ -183,13 +197,48 @@
                                         </span>
                                     }
                                 </td>
+                                <td class="pe-4 text-end">
+                                    <div class="d-inline-flex gap-1 align-items-center">
+                                        <a asp-action="Edit" asp-route-id="@item.id" class="btn btn-sm btn-outline-primary" title="Editar usuario">
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                            </svg>
+                                        </a>
+
+                                        @if (item.id == currentUserId)
+                                        {
+                                            <span class="badge bg-light text-muted border px-2 py-1 small" title="Tu usuario en sesión activa">
+                                                Sesión
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="ToggleEstado" asp-route-id="@item.id" method="post" class="d-inline"
+                                                  onsubmit="return confirm('¿Está seguro de que desea @(item.activo ? "desactivar" : "activar") la cuenta de @item.email?');">
+                                                @Html.AntiForgeryToken()
+                                                @if (item.activo)
+                                                {
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Desactivar cuenta">
+                                                        ⏸
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Activar cuenta">
+                                                        ▶
+                                                    </button>
+                                                }
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="5" class="text-center py-5">
+                            <td colspan="6" class="text-center py-5">
                                 <div class="text-muted">
                                     <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="mb-2 opacity-50">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -205,4 +254,3 @@
         </div>
     </div>
 </div>
-

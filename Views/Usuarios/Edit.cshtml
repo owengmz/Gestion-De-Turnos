@@ -1,0 +1,201 @@
+@model mvc.Models.ViewModels.EditarUsuarioViewModel
+
+@{
+    ViewData["Title"] = $"Editar Usuario: {Model.Email}";
+}
+
+<div class="py-3">
+    <!-- Volver al listado -->
+    <div class="mb-3">
+        <a asp-action="Index" class="text-decoration-none text-muted d-inline-flex align-items-center gap-1">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            <span>Volver al listado de usuarios</span>
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis p-2">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                </svg>
+                            </span>
+                            <h2 class="h4 fw-bold mb-0" style="color: var(--teal, #216d68);">Editar Cuenta de Usuario</h2>
+                        </div>
+                        <span class="badge bg-light text-muted border px-2 py-1">ID #@Model.Id</span>
+                    </div>
+                    <p class="text-muted small">Modifica los datos personales, rol en el sistema o resetea la contraseña de acceso.</p>
+                </div>
+
+                <div class="card-body p-4">
+                    @if (Model.EsUsuarioLogueado)
+                    {
+                        <div class="alert alert-info py-2 small d-flex align-items-center mb-4" role="alert">
+                            <svg class="bi flex-shrink-0 me-2" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                            </svg>
+                            <div>
+                                <strong>Nota de seguridad:</strong> Estás editando tu propia cuenta en sesión activa. Por protección, tu rol permanece como Administrador y no puedes desactivarte.
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="EsUsuarioLogueado" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                        <!-- Sección 1: Datos Personales -->
+                        <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                            1. Información Personal
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Nombre" class="form-label fw-semibold text-dark">
+                                    Nombre <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Nombre" class="form-control" />
+                                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Apellido" class="form-label fw-semibold text-dark">
+                                    Apellido <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Apellido" class="form-control" />
+                                <span asp-validation-for="Apellido" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Email" class="form-label fw-semibold text-dark">
+                                    Correo Electrónico <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Sección 2: Rol y Estado -->
+                        <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                            2. Rol y Permisos
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Rol" class="form-label fw-semibold text-dark">
+                                    Rol en el Sistema <span class="text-danger">*</span>
+                                </label>
+                                @if (Model.EsUsuarioLogueado)
+                                {
+                                    <input type="hidden" asp-for="Rol" />
+                                    <select class="form-select" disabled>
+                                        <option selected>Administrador (Tu rol actual)</option>
+                                    </select>
+                                    <span class="text-muted small fst-italic">No puedes quitarte el rol de administrador a ti mismo.</span>
+                                }
+                                else
+                                {
+                                    <select asp-for="Rol" id="selectRol" class="form-select">
+                                        <option value="Administrador">Administrador</option>
+                                        <option value="Recepcionista">Recepcionista</option>
+                                        <option value="Profesional">Profesional</option>
+                                    </select>
+                                    <span asp-validation-for="Rol" class="text-danger small"></span>
+                                }
+                            </div>
+
+                            <div class="col-12 col-md-6" id="contenedorProfesional" style="display: @(Model.Rol == mvc.Models.Rol.Profesional ? "block" : "none");">
+                                <label asp-for="ProfesionalId" class="form-label fw-semibold text-dark">
+                                    Vincular a Médico <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="ProfesionalId" asp-items="ViewBag.Profesionales" class="form-select">
+                                    <option value="">-- Seleccione el profesional --</option>
+                                </select>
+                                <span asp-validation-for="ProfesionalId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch mt-2">
+                                    @if (Model.EsUsuarioLogueado)
+                                    {
+                                        <input class="form-check-input" type="checkbox" role="switch" checked disabled />
+                                        <input type="hidden" asp-for="Activo" value="true" />
+                                        <label class="form-check-label fw-medium text-dark">
+                                            Cuenta Activa (No puedes desactivar tu propia cuenta)
+                                        </label>
+                                    }
+                                    else
+                                    {
+                                        <input class="form-check-input" type="checkbox" role="switch" asp-for="Activo" id="activoSwitch" />
+                                        <label class="form-check-label fw-medium text-dark" for="activoSwitch">
+                                            Cuenta Habilitada / Activa
+                                        </label>
+                                    }
+                                </div>
+                                <div class="form-text small">
+                                    Los usuarios desactivados no podrán iniciar sesión en el sistema.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 3: Reseteo de Contraseña (Opcional) -->
+                        <h6 class="fw-bold text-secondary text-uppercase mb-3 pb-1 border-bottom" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                            3. Cambiar Contraseña <span class="text-muted fw-normal text-lowercase">(dejar en blanco para mantener la actual)</span>
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="PasswordNueva" class="form-label fw-semibold text-dark">
+                                    Nueva Contraseña
+                                </label>
+                                <input asp-for="PasswordNueva" type="password" class="form-control" placeholder="Dejar vacío para no cambiar" />
+                                <span asp-validation-for="PasswordNueva" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="ConfirmarPasswordNueva" class="form-label fw-semibold text-dark">
+                                    Confirmar Nueva Contraseña
+                                </label>
+                                <input asp-for="ConfirmarPasswordNueva" type="password" class="form-control" placeholder="Repetir si se ingresó nueva clave" />
+                                <span asp-validation-for="ConfirmarPasswordNueva" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancelar</a>
+                            <button type="submit" class="btn app-button-primary px-4">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectRol = document.getElementById('selectRol');
+            const contenedorProfesional = document.getElementById('contenedorProfesional');
+
+            if (selectRol && contenedorProfesional) {
+                function alternarSelectorProfesional() {
+                    if (selectRol.value === 'Profesional') {
+                        contenedorProfesional.style.display = 'block';
+                    } else {
+                        contenedorProfesional.style.display = 'none';
+                    }
+                }
+
+                selectRol.addEventListener('change', alternarSelectorProfesional);
+            }
+        });
+    </script>
+}
+

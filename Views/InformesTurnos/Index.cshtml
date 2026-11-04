@@ -14,6 +14,67 @@
         </p>
     </div>
 
+    <!-- INDICADORES ESTADÍSTICOS -->
+    <div class="row mb-4">
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total de turnos</p>
+                    <h3 class="fw-bold">@ViewBag.TotalRegistros</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Pendientes</p>
+                    <h3 class="fw-bold text-warning">@ViewBag.TotalPendientes</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Confirmados</p>
+                    <h3 class="fw-bold text-primary">@ViewBag.TotalConfirmados</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Atendidos</p>
+                    <h3 class="fw-bold text-success">@ViewBag.TotalAtendidos</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Cancelados</p>
+                    <h3 class="fw-bold text-danger">@ViewBag.TotalCancelados</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Ausentes</p>
+                    <h3 class="fw-bold text-secondary">@ViewBag.TotalAusentes</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    
+
     <!-- FILTROS -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">

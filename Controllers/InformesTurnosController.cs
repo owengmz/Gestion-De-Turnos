@@ -41,6 +41,30 @@ namespace mvc.Controllers
             if (!string.IsNullOrWhiteSpace(estado))
                 consulta = consulta.Where(t => t.estado == estado);
 
+            ViewBag.TotalPendientes = await consulta
+                .CountAsync(t => t.estado == "Pendiente");
+
+            ViewBag.TotalConfirmados = await consulta
+                .CountAsync(t => t.estado == "Confirmado");
+
+            ViewBag.TotalAtendidos = await consulta
+                .CountAsync(t => t.estado == "Atendido");
+
+            ViewBag.TotalCancelados = await consulta
+                .CountAsync(t => t.estado == "Cancelado");
+
+            ViewBag.TotalAusentes = await consulta
+                .CountAsync(t => t.estado == "Ausente"); 
+
+            ViewBag.DatosGrafico = new[]
+            {
+                new { Estado = "Pendiente", Cantidad = ViewBag.TotalPendientes },
+                new { Estado = "Confirmado", Cantidad = ViewBag.TotalConfirmados },
+                new { Estado = "Atendido", Cantidad = ViewBag.TotalAtendidos },
+                new { Estado = "Cancelado", Cantidad = ViewBag.TotalCancelados },
+                new { Estado = "Ausente", Cantidad = ViewBag.TotalAusentes }
+            };       
+
             consulta = consulta
                 .OrderByDescending(t => t.fecha)
                 .ThenByDescending(t => t.hora);

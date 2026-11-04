@@ -17,12 +17,23 @@
             </p>
         </div>
 
-        <a asp-controller="Turnos"
-           asp-action="Create"
-           class="btn text-white px-4 py-3"
-           style="background-color: #2f706b; border-radius: 8px; min-width: 140px;">
-            <strong>Crear Turno</strong>
+        <div class="d-flex gap-2">
+
+        <a asp-controller="HorariosAtencion"
+        asp-action="Index"
+        class="btn btn-outline-secondary px-4 py-3"
+        style="border-radius: 8px;">
+            <strong>Horarios de Atención</strong>
         </a>
+
+        <a asp-controller="Turnos"
+            asp-action="Create"
+            class="btn text-white px-4 py-3"
+            style="background-color: #2f706b; border-radius: 8px; min-width: 140px;">
+                <strong>Crear Turno</strong>
+        </a>
+
+    </div>
 
     </div>
 

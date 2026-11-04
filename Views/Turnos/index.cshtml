@@ -56,27 +56,55 @@
                             : "Sin profesional")
                     </td>
                     <td>@turno.motivo</td>
-                    <td>@turno.estado</td>
                     <td>
-                        <a asp-controller="Turnos"
-                        asp-action="Edit"
-                        asp-route-id="@turno.id"
-                        class="btn btn-sm text-white"
-                        style="background-color: #2f706b; border-radius: 6px;">
-                            Editar
-                        </a>
-                        <form asp-controller="Turnos"
-                            asp-action="Cancelar"
+                        @if (turno.estado == "Cancelado")
+                        {
+                            <span class="badge bg-danger">Cancelado</span>
+                        }
+                        else if (turno.estado == "Atendido")
+                        {
+                            <span class="badge bg-success">Atendido</span>
+                        }
+                        else if (turno.estado == "Confirmado")
+                        {
+                            <span class="badge bg-primary">Confirmado</span>
+                        }
+                        else if (turno.estado == "Ausente")
+                        {
+                            <span class="badge bg-secondary">Ausente</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Pendiente</span>
+                        }
+                    </td>
+                    <td>
+                        @if (turno.estado != "Cancelado")
+                        {
+                            <a asp-controller="Turnos"
+                            asp-action="Edit"
                             asp-route-id="@turno.id"
-                            method="post"
-                            onsubmit="return confirm('¿Está seguro de cancelar este turno?');"
-                            style="display:inline;">
+                            class="btn btn-sm text-white"
+                            style="background-color: #2f706b; border-radius: 6px;">
+                                Editar
+                            </a>
 
-                            <button type="submit"
-                                    class="btn btn-sm btn-danger">
-                                Cancelar
-                            </button>
-                        </form>
+                            <form asp-controller="Turnos"
+                                asp-action="Cancelar"
+                                asp-route-id="@turno.id"
+                                method="post"
+                                onsubmit="return confirm('¿Está seguro de cancelar este turno?');"
+                                style="display:inline;">
+
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    Cancelar
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin acciones</span>
+                        }
                     </td>
                 </tr>
             }

@@ -122,6 +122,18 @@
                         else
                         {
                             <span class="text-muted">Sin acciones</span>
+
+                            <form asp-controller="Turnos"
+                                asp-action="Eliminar"
+                                asp-route-id="@turno.id"
+                                method="post"
+                                style="display:inline;"
+                                onsubmit="return confirm('¿Está seguro de eliminar definitivamente este turno? Esta acción no se puede deshacer.');">
+
+                                <button type="submit" class="btn btn-sm btn-dark">
+                                    Eliminar
+                                </button>
+                            </form>
                         }
                     </td>
                 </tr>

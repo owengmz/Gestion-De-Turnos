@@ -65,6 +65,18 @@
                         style="background-color: #2f706b; border-radius: 6px;">
                             Editar
                         </a>
+                        <form asp-controller="Turnos"
+                            asp-action="Cancelar"
+                            asp-route-id="@turno.id"
+                            method="post"
+                            onsubmit="return confirm('¿Está seguro de cancelar este turno?');"
+                            style="display:inline;">
+
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger">
+                                Cancelar
+                            </button>
+                        </form>
                     </td>
                 </tr>
             }

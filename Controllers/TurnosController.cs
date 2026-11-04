@@ -284,6 +284,40 @@ namespace mvc.Controllers
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancelar(int id)
+    {
+        var turno = await _context.Turnos.FindAsync(id);
+
+        if (turno == null)
+            return NotFound();
+
+        if (turno.estado == "Cancelado")
+        {
+            TempData["Error"] = "El turno ya se encuentra cancelado.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var usuarioIdTexto = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!int.TryParse(usuarioIdTexto, out int usuarioId))
+            return Forbid();
+
+        turno.estado = "Cancelado";
+        turno.usuario_modificador_id = usuarioId;
+        turno.fecha_modificacion = DateTime.SpecifyKind(
+            DateTime.Now,
+            DateTimeKind.Unspecified
+        );
+
+        await _context.SaveChangesAsync();
+
+        TempData["Mensaje"] = "El turno fue cancelado correctamente.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
 
     [HttpGet]
     public async Task<IActionResult> BuscarPacientes(string term)

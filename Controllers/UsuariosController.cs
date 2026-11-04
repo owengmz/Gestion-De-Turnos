@@ -14,6 +14,7 @@ public class UsuariosController : Controller
 {
     private readonly AppDbContext _context;
     private readonly IPasswordHasher<Usuario> _passwordHasher;
+    private const int RegistrosPorPagina = 3;
 
     public UsuariosController(AppDbContext context, IPasswordHasher<Usuario> passwordHasher)
     {
@@ -22,7 +23,7 @@ public class UsuariosController : Controller
     }
 
     // GET: Usuarios
-    public async Task<IActionResult> Index(string? search, Rol? rolFiltro, string? estadoFiltro)
+    public async Task<IActionResult> Index(string? search, Rol? rolFiltro, string? estadoFiltro, int pagina = 1)
     {
         var query = _context.Usuarios
             .Include(u => u.Profesional)
@@ -52,10 +53,11 @@ public class UsuariosController : Controller
             query = query.Where(u => !u.activo);
         }
 
-        var usuarios = await query
+        query = query
             .OrderBy(u => u.apellido)
-            .ThenBy(u => u.nombre)
-            .ToListAsync();
+            .ThenBy(u => u.nombre);
+
+        var usuarios = await ResultadoPaginado<Usuario>.CrearAsync(query, pagina, RegistrosPorPagina);
 
         ViewBag.Search = search;
         ViewBag.RolFiltro = rolFiltro;

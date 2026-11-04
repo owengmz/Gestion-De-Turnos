@@ -1,10 +1,11 @@
-@model IEnumerable<mvc.Models.Especialidad>
+@model mvc.Models.ResultadoPaginado<mvc.Models.Especialidad>
 
 @{
     ViewData["Title"] = "Especialidades Médicas";
     var currentSearch = ViewBag.Search as string;
     var currentFilter = ViewBag.EstadoFiltro as string ?? "todos";
     var isAdmin = User.IsInRole("Administrador");
+    var totalPaginas = Model.TotalPaginas == 0 ? 1 : Model.TotalPaginas;
 }
 
 <div class="py-3">
@@ -89,9 +90,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model != null && Model.Any())
+                    @if (Model != null && Model.Registros.Any())
                     {
-                        foreach (var item in Model)
+                        foreach (var item in Model.Registros)
                         {
                             var countProfesionales = item.Profesionales?.Count ?? 0;
                             <tr class="@(!item.estado ? "table-light opacity-75" : "")">
@@ -179,5 +180,29 @@
                 </tbody>
             </table>
         </div>
+
+        @if (Model != null && Model.TotalRegistros > 0)
+        {
+            <!-- Paginado por Servidor -->
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3 border-top">
+                <small class="text-muted">@Model.TotalRegistros registros - página @Model.Pagina de @totalPaginas</small>
+                <div>
+                    <a asp-action="Index"
+                       asp-route-pagina="@(Model.Pagina - 1)"
+                       asp-route-search="@currentSearch"
+                       asp-route-estadoFiltro="@currentFilter"
+                       class="btn btn-outline-secondary btn-sm me-1 @(Model.TienePaginaAnterior ? "" : "disabled")">
+                        Anterior
+                    </a>
+                    <a asp-action="Index"
+                       asp-route-pagina="@(Model.Pagina + 1)"
+                       asp-route-search="@currentSearch"
+                       asp-route-estadoFiltro="@currentFilter"
+                       class="btn btn-outline-secondary btn-sm @(Model.TienePaginaSiguiente ? "" : "disabled")">
+                        Siguiente
+                    </a>
+                </div>
+            </div>
+        }
     </div>
 </div>

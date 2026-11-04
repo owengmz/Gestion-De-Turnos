@@ -9,6 +9,7 @@ namespace mvc.Controllers;
 public class EspecialidadesController : Controller
 {
     private readonly AppDbContext _context;
+    private const int RegistrosPorPagina = 3;
 
     public EspecialidadesController(AppDbContext context)
     {
@@ -16,7 +17,7 @@ public class EspecialidadesController : Controller
     }
 
     // GET: Especialidades
-    public async Task<IActionResult> Index(string? search, string? estadoFiltro)
+    public async Task<IActionResult> Index(string? search, string? estadoFiltro, int pagina = 1)
     {
         var query = _context.Especialidades
             .Include(e => e.Profesionales)
@@ -39,9 +40,9 @@ public class EspecialidadesController : Controller
             query = query.Where(e => !e.estado);
         }
 
-        var especialidades = await query
-            .OrderBy(e => e.nombre)
-            .ToListAsync();
+        query = query.OrderBy(e => e.nombre);
+
+        var especialidades = await ResultadoPaginado<Especialidad>.CrearAsync(query, pagina, RegistrosPorPagina);
 
         ViewBag.Search = search;
         ViewBag.EstadoFiltro = estadoFiltro ?? "todos";

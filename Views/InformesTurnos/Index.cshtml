@@ -1,0 +1,298 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model IEnumerable<mvc.Models.Turno>
+
+@{
+    ViewData["Title"] = "Informes de Turnos";
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">Informes de Turnos</h2>
+        <p class="text-muted">
+            Consultá y filtrá los turnos registrados en el sistema.
+        </p>
+    </div>
+
+    <!-- INDICADORES ESTADÍSTICOS -->
+    <div class="row mb-4">
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total de turnos</p>
+                    <h3 class="fw-bold">@ViewBag.TotalRegistros</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Pendientes</p>
+                    <h3 class="fw-bold text-warning">@ViewBag.TotalPendientes</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Confirmados</p>
+                    <h3 class="fw-bold text-primary">@ViewBag.TotalConfirmados</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Atendidos</p>
+                    <h3 class="fw-bold text-success">@ViewBag.TotalAtendidos</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Cancelados</p>
+                    <h3 class="fw-bold text-danger">@ViewBag.TotalCancelados</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Ausentes</p>
+                    <h3 class="fw-bold text-secondary">@ViewBag.TotalAusentes</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    
+
+    <!-- FILTROS -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+            <form asp-action="Index" method="get">
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Fecha desde</label>
+                        <input type="date"
+                               name="fechaDesde"
+                               value="@ViewBag.FechaDesde"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Fecha hasta</label>
+                        <input type="date"
+                               name="fechaHasta"
+                               value="@ViewBag.FechaHasta"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Profesional</label>
+
+                        <select name="profesionalId"
+                                class="form-select">
+                            <option value="">Todos los profesionales</option>
+
+                            @foreach (var profesional in ViewBag.Profesionales)
+                            {
+                                <option value="@profesional.id"
+                                        selected="@(ViewBag.ProfesionalId == profesional.id)">
+                                    @profesional.nombre @profesional.apellido
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Estado</label>
+
+                        <select name="estado" class="form-select">
+                            <option value="">Todos los estados</option>
+                            <option value="Pendiente" selected="@(ViewBag.Estado == "Pendiente")">Pendiente</option>
+                            <option value="Confirmado" selected="@(ViewBag.Estado == "Confirmado")">Confirmado</option>
+                            <option value="Atendido" selected="@(ViewBag.Estado == "Atendido")">Atendido</option>
+                            <option value="Cancelado" selected="@(ViewBag.Estado == "Cancelado")">Cancelado</option>
+                            <option value="Ausente" selected="@(ViewBag.Estado == "Ausente")">Ausente</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn text-white px-4"
+                            style="background-color: #2f706b;">
+                        Buscar
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary px-4">
+                        Limpiar filtros
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Resultados</h5>
+
+                <span class="text-muted">
+                    Total de registros: <strong>@ViewBag.TotalRegistros</strong>
+                </span>
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Paciente</th>
+                            <th>Profesional</th>
+                            <th>Motivo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6"
+                                    class="text-center text-muted py-4">
+                                    No se encontraron turnos con los filtros seleccionados.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var turno in Model)
+                            {
+                                <tr>
+                                    <td>@turno.fecha.ToString("dd/MM/yyyy")</td>
+                                    <td>@turno.hora.ToString(@"hh\:mm")</td>
+
+                                    <td>
+                                        @(turno.Paciente != null
+                                            ? $"{turno.Paciente.nombre} {turno.Paciente.apellido}"
+                                            : "No disponible")
+                                    </td>
+
+                                    <td>
+                                        @(turno.Profesional != null
+                                            ? $"{turno.Profesional.nombre} {turno.Profesional.apellido}"
+                                            : "No disponible")
+                                    </td>
+
+                                    <td>@turno.motivo</td>
+
+                                    <td>
+                                        @if (turno.estado == "Cancelado")
+                                        {
+                                            <span class="badge bg-danger">Cancelado</span>
+                                        }
+                                        else if (turno.estado == "Atendido")
+                                        {
+                                            <span class="badge bg-success">Atendido</span>
+                                        }
+                                        else if (turno.estado == "Confirmado")
+                                        {
+                                            <span class="badge bg-primary">Confirmado</span>
+                                        }
+                                        else if (turno.estado == "Ausente")
+                                        {
+                                            <span class="badge bg-secondary">Ausente</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">Pendiente</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- PAGINACIÓN -->
+            @if (ViewBag.TotalPaginas > 1)
+            {
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+
+                        <li class="page-item @(ViewBag.PaginaActual == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-fechaDesde="@ViewBag.FechaDesde"
+                               asp-route-fechaHasta="@ViewBag.FechaHasta"
+                               asp-route-profesionalId="@ViewBag.ProfesionalId"
+                               asp-route-estado="@ViewBag.Estado"
+                               asp-route-pagina="@(ViewBag.PaginaActual - 1)">
+                                Anterior
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
+                        {
+                            <li class="page-item @(ViewBag.PaginaActual == i ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-fechaDesde="@ViewBag.FechaDesde"
+                                   asp-route-fechaHasta="@ViewBag.FechaHasta"
+                                   asp-route-profesionalId="@ViewBag.ProfesionalId"
+                                   asp-route-estado="@ViewBag.Estado"
+                                   asp-route-pagina="@i">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(ViewBag.PaginaActual == ViewBag.TotalPaginas ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-fechaDesde="@ViewBag.FechaDesde"
+                               asp-route-fechaHasta="@ViewBag.FechaHasta"
+                               asp-route-profesionalId="@ViewBag.ProfesionalId"
+                               asp-route-estado="@ViewBag.Estado"
+                               asp-route-pagina="@(ViewBag.PaginaActual + 1)">
+                                Siguiente
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            }
+
+        </div>
+    </div>
+
+</div>

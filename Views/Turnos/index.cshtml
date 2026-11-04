@@ -17,12 +17,30 @@
             </p>
         </div>
 
-        <a asp-controller="Turnos"
-           asp-action="Create"
-           class="btn text-white px-4 py-3"
-           style="background-color: #2f706b; border-radius: 8px; min-width: 140px;">
-            <strong>Crear Turno</strong>
-        </a>
+        <div class="d-flex gap-2">
+
+            <a asp-controller="HorariosAtencion"
+            asp-action="Index"
+            class="btn btn-outline-secondary px-4 py-3"
+            style="border-radius: 8px;">
+                <strong>Horarios de Atención</strong>
+            </a>
+
+            <a asp-controller="InformesTurnos"
+            asp-action="Index"
+            class="btn btn-outline-secondary px-4 py-3"
+            style="border-radius: 8px;">
+                <strong>Informes de Turnos</strong>
+            </a>
+
+            <a asp-controller="Turnos"
+            asp-action="Create"
+            class="btn text-white px-4 py-3"
+            style="background-color: #2f706b; border-radius: 8px; min-width: 140px;">
+                <strong>Crear Turno</strong>
+            </a>
+
+        </div>
 
     </div>
 
@@ -104,6 +122,18 @@
                         else
                         {
                             <span class="text-muted">Sin acciones</span>
+
+                            <form asp-controller="Turnos"
+                                asp-action="Eliminar"
+                                asp-route-id="@turno.id"
+                                method="post"
+                                style="display:inline;"
+                                onsubmit="return confirm('¿Está seguro de eliminar definitivamente este turno? Esta acción no se puede deshacer.');">
+
+                                <button type="submit" class="btn btn-sm btn-dark">
+                                    Eliminar
+                                </button>
+                            </form>
                         }
                     </td>
                 </tr>

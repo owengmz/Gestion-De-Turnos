@@ -20,7 +20,7 @@ namespace mvc.Controllers
        
     public async Task<IActionResult> Index(int pagina = 1)
     {
-        int registrosPorPagina = 10;
+        int registrosPorPagina = 4;
 
         var consulta = _context.Turnos
             .Include(t => t.Paciente)
@@ -318,6 +318,26 @@ namespace mvc.Controllers
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Eliminar(int id)
+    {
+        var turno = await _context.Turnos.FindAsync(id);
+
+        if (turno == null)
+        {
+            TempData["Error"] = "El turno no existe.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        _context.Turnos.Remove(turno);
+
+        await _context.SaveChangesAsync();
+
+        TempData["Mensaje"] = "El turno fue eliminado correctamente.";
+
+        return RedirectToAction(nameof(Index));
+    }
 
     [HttpGet]
     public async Task<IActionResult> BuscarPacientes(string term)

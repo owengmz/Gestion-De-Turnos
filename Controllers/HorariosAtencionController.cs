@@ -17,7 +17,7 @@ namespace mvc.Controllers
 
         public async Task<IActionResult> Index(int pagina = 1)
         {
-            int registrosPorPagina = 10;
+            int registrosPorPagina = 5;
 
             var consulta = _context.HorariosAtencion
                 .Include(h => h.Profesional)

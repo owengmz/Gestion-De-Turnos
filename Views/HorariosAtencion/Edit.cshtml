@@ -1,0 +1,105 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model mvc.Models.HorarioAtencion
+
+@{
+    ViewData["Title"] = "Editar Horario";
+}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold mb-2">Editar Horario de Atención</h2>
+
+    <p class="text-muted mb-4">
+        Modificar el horario disponible del profesional.
+    </p>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+
+            <form asp-action="Edit" asp-route-id="@Model.id" method="post">
+
+                <input type="hidden" asp-for="id" />
+
+                <div asp-validation-summary="All"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">Profesional</label>
+
+                    <select asp-for="profesional_id"
+                            class="form-select"
+                            asp-items="@(new SelectList(ViewBag.Profesionales, "id", "NombreCompleto"))">
+                        <option value="">Seleccione un profesional</option>
+                    </select>
+
+                    <span asp-validation-for="profesional_id"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Día de atención</label>
+
+                    <select asp-for="dia_semana" class="form-select">
+                        <option value="Lunes">Lunes</option>
+                        <option value="Martes">Martes</option>
+                        <option value="Miercoles">Miércoles</option>
+                        <option value="Jueves">Jueves</option>
+                        <option value="Viernes">Viernes</option>
+                        <option value="Sabado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                    </select>
+
+                    <span asp-validation-for="dia_semana"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Hora desde</label>
+
+                        <input asp-for="hora_desde"
+                               type="time"
+                               class="form-control" />
+
+                        <span asp-validation-for="hora_desde"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Hora hasta</label>
+
+                        <input asp-for="hora_hasta"
+                               type="time"
+                               class="form-control" />
+
+                        <span asp-validation-for="hora_hasta"
+                              class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+
+                    <button type="submit"
+                            class="btn text-white px-4"
+                            style="background-color: #2f706b;">
+                        Guardar Cambios
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary px-4">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

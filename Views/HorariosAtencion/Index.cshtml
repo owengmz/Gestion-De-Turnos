@@ -78,11 +78,31 @@
 
                                     <td>
                                         <a asp-action="Edit"
-                                           asp-route-id="@horario.id"
-                                           class="btn btn-sm text-white"
-                                           style="background-color: #2f706b;">
+                                        asp-route-id="@horario.id"
+                                        class="btn btn-sm text-white"
+                                        style="background-color: #2f706b;">
                                             Editar
                                         </a>
+
+                                        <form asp-action="CambiarEstado"
+                                            asp-route-id="@horario.id"
+                                            method="post"
+                                            style="display:inline;"
+                                            onsubmit="return confirm('¿Está seguro de cambiar el estado de este horario?');">
+
+                                            @if (horario.estado)
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    Desactivar
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    Activar
+                                                </button>
+                                            }
+                                        </form>
                                     </td>
                                 </tr>
                             }
@@ -90,6 +110,43 @@
                     </tbody>
 
                 </table>
+
+                @if (ViewBag.TotalPaginas > 1)
+                {
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+
+                            <li class="page-item @(ViewBag.PaginaActual == 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                asp-action="Index"
+                                asp-route-pagina="@(ViewBag.PaginaActual - 1)">
+                                    Anterior
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
+                            {
+                                <li class="page-item @(ViewBag.PaginaActual == i ? "active" : "")">
+                                    <a class="page-link"
+                                    asp-action="Index"
+                                    asp-route-pagina="@i">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(ViewBag.PaginaActual == ViewBag.TotalPaginas ? "disabled" : "")">
+                                <a class="page-link"
+                                asp-action="Index"
+                                asp-route-pagina="@(ViewBag.PaginaActual + 1)">
+                                    Siguiente
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                }
+
             </div>
 
         </div>

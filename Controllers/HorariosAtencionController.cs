@@ -45,6 +45,51 @@ namespace mvc.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ListarJson(int pagina = 1)
+        {
+            int registrosPorPagina = 5;
+
+            var consulta = _context.HorariosAtencion
+                .Include(h => h.Profesional)
+                .OrderBy(h => h.profesional_id)
+                .ThenBy(h => h.dia_semana)
+                .ThenBy(h => h.hora_desde);
+
+            int totalRegistros = await consulta.CountAsync();
+
+            int totalPaginas = (int)Math.Ceiling(
+                (double)totalRegistros / registrosPorPagina
+            );
+
+            pagina = Math.Max(1, Math.Min(pagina, Math.Max(1, totalPaginas)));
+
+            var horarios = await consulta
+                .Skip((pagina - 1) * registrosPorPagina)
+                .Take(registrosPorPagina)
+                .Select(h => new
+                {
+                    id = h.id,
+                    profesionalId = h.profesional_id,
+                    profesional = h.Profesional != null
+                        ? h.Profesional.nombre + " " + h.Profesional.apellido
+                        : "Profesional no disponible",
+                    dia = h.dia_semana,
+                    horaDesde = h.hora_desde.ToString(@"hh\:mm"),
+                    horaHasta = h.hora_hasta.ToString(@"hh\:mm"),
+                    estado = h.estado
+                })
+                .ToListAsync();
+
+            return Json(new
+            {
+                datos = horarios,
+                paginaActual = pagina,
+                totalPaginas,
+                totalRegistros
+            });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             await CargarProfesionales();

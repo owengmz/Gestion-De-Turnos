@@ -1,10 +1,10 @@
 @model IEnumerable<mvc.Models.HorarioAtencion>
-
+    
 @{
     ViewData["Title"] = "Horarios de Atención";
 }
 
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-4" id="appHorarios">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -40,115 +40,145 @@
                     </thead>
 
                     <tbody>
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
-                                    No hay horarios registrados.
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            @foreach (var horario in Model)
-                            {
-                                <tr>
-                                    <td>
-                                        @(horario.Profesional != null
-                                            ? $"{horario.Profesional.nombre} {horario.Profesional.apellido}"
-                                            : "Profesional no disponible")
-                                    </td>
+                        <tr v-if="cargando">
+                            <td colspan="6" class="text-center py-4">
+                                Cargando horarios...
+                            </td>
+                        </tr>
 
-                                    <td>@horario.dia_semana</td>
+                        <tr v-else-if="horarios.length === 0">
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No hay horarios registrados.
+                            </td>
+                        </tr>
 
-                                    <td>@horario.hora_desde.ToString(@"hh\:mm")</td>
+                        <tr v-for="horario in horarios" :key="horario.id">
+                            <td>{{ horario.profesional }}</td>
+                            <td>{{ horario.dia }}</td>
+                            <td>{{ horario.horaDesde }}</td>
+                            <td>{{ horario.horaHasta }}</td>
 
-                                    <td>@horario.hora_hasta.ToString(@"hh\:mm")</td>
+                            <td>
+                                <span v-if="horario.estado" class="badge bg-success">
+                                    Activo
+                                </span>
+                                <span v-else class="badge bg-secondary">
+                                    Inactivo
+                                </span>
+                            </td>
 
-                                    <td>
-                                        @if (horario.estado)
-                                        {
-                                            <span class="badge bg-success">Activo</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Inactivo</span>
-                                        }
-                                    </td>
-
-                                    <td>
-                                        <a asp-action="Edit"
-                                        asp-route-id="@horario.id"
-                                        class="btn btn-sm text-white"
-                                        style="background-color: #2f706b;">
-                                            Editar
-                                        </a>
-
-                                        <form asp-action="CambiarEstado"
-                                            asp-route-id="@horario.id"
-                                            method="post"
-                                            style="display:inline;"
-                                            onsubmit="return confirm('¿Está seguro de cambiar el estado de este horario?');">
-
-                                            @if (horario.estado)
-                                            {
-                                                <button type="submit" class="btn btn-sm btn-danger">
-                                                    Desactivar
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <button type="submit" class="btn btn-sm btn-success">
-                                                    Activar
-                                                </button>
-                                            }
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                        }
+                            <td>
+                                <a :href="'/HorariosAtencion/Edit/' + horario.id"
+                                class="btn btn-sm text-white"
+                                style="background-color: #2f706b;">
+                                    Editar
+                                </a>
+                            </td>
+                        </tr>
                     </tbody>
 
                 </table>
+                 <!-- PAGINACION VUE -->
+                <nav class="mt-4" v-if="totalPaginas > 1">
+                    <ul class="pagination justify-content-center">
 
-                @if (ViewBag.TotalPaginas > 1)
-                {
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
+                        <li class="page-item" :class="{ disabled: paginaActual === 1 }">
+                            <button class="page-link"
+                                    @@click="cambiarPagina(paginaActual - 1)"
+                                    :disabled="paginaActual === 1">
+                                Anterior
+                            </button>
+                        </li>
 
-                            <li class="page-item @(ViewBag.PaginaActual == 1 ? "disabled" : "")">
-                                <a class="page-link"
-                                asp-action="Index"
-                                asp-route-pagina="@(ViewBag.PaginaActual - 1)">
-                                    Anterior
-                                </a>
-                            </li>
+                        <li v-for="pagina in totalPaginas"
+                            :key="pagina"
+                            class="page-item"
+                            :class="{ active: paginaActual === pagina }">
 
-                            @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
-                            {
-                                <li class="page-item @(ViewBag.PaginaActual == i ? "active" : "")">
-                                    <a class="page-link"
-                                    asp-action="Index"
-                                    asp-route-pagina="@i">
-                                        @i
-                                    </a>
-                                </li>
-                            }
+                            <button class="page-link"
+                                    @@click="cambiarPagina(pagina)">
+                                {{ pagina }}
+                            </button>
+                        </li>
 
-                            <li class="page-item @(ViewBag.PaginaActual == ViewBag.TotalPaginas ? "disabled" : "")">
-                                <a class="page-link"
-                                asp-action="Index"
-                                asp-route-pagina="@(ViewBag.PaginaActual + 1)">
-                                    Siguiente
-                                </a>
-                            </li>
+                        <li class="page-item"
+                            :class="{ disabled: paginaActual === totalPaginas }">
 
-                        </ul>
-                    </nav>
-                }
+                            <button class="page-link"
+                                    @@click="cambiarPagina(paginaActual + 1)"
+                                    :disabled="paginaActual === totalPaginas">
+                                Siguiente
+                            </button>
+                        </li>
+
+                    </ul>
+                </nav>
+
+                <div class="text-muted text-center mt-2">
+                    Total de horarios: {{ totalRegistros }}
+                </div>
 
             </div>
 
         </div>
     </div>
 </div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                horarios: [],
+                paginaActual: 1,
+                totalPaginas: 1,
+                totalRegistros: 0,
+                cargando: false
+            };
+        },
+
+        methods: {
+            async cargarHorarios(pagina = 1) {
+                this.cargando = true;
+
+                try {
+                    const respuesta = await fetch(
+                        '@Url.Action("ListarJson", "HorariosAtencion")?pagina=' + pagina
+                    );
+
+                    if (!respuesta.ok) {
+                        throw new Error('No se pudieron cargar los horarios.');
+                    }
+
+                    const datos = await respuesta.json();
+
+                    this.horarios = datos.datos;
+                    this.paginaActual = datos.paginaActual;
+                    this.totalPaginas = datos.totalPaginas;
+                    this.totalRegistros = datos.totalRegistros;
+
+                } catch (error) {
+                    alert(error.message);
+                } finally {
+                    this.cargando = false;
+                }
+            },
+
+            cambiarPagina(pagina) {
+                if (pagina < 1 || pagina > this.totalPaginas) {
+                    return;
+                }
+
+                this.cargarHorarios(pagina);
+            }
+        },
+
+        mounted() {
+            this.cargarHorarios();
+        }
+
+    }).mount('#appHorarios');
+</script>

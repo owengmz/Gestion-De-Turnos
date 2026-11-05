@@ -40,6 +40,7 @@ builder.Services
           ? CookieSecurePolicy.SameAsRequest
           : CookieSecurePolicy.Always;
     })
+    // Configuracion de autenticacion JWT Bearer para la Web API 
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
       var jwtKey = builder.Configuration["Jwt:Key"] ?? "ClaveSecretaSuperSeguraParaCentroMedicoTurnos2026!*";
@@ -60,7 +61,6 @@ builder.Services
 // Configuracion de autorizacion
 builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
-
 var app = builder.Build();
 // siembra de usuarios por rol
 using (var scope = app.Services.CreateScope())
@@ -69,7 +69,7 @@ using (var scope = app.Services.CreateScope())
   var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<Usuario>>();
   UsuariosDePrueba.Sembrar(db, hasher);
 }
-
+// Verificacion de conexion a PostgreSQL 
 using (var scope = app.Services.CreateScope())
 {
   var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -85,13 +85,13 @@ using (var scope = app.Services.CreateScope())
     app.Logger.LogError(ex, "Error al conectar con PostgreSQL.");
   }
 }
-
+// Configuracion del pipeline de la aplicacion
 if (!app.Environment.IsDevelopment())
 {
   app.UseExceptionHandler("/Home/Error");
   app.UseHsts();
 }
-
+// Redireccionamiento a HTTPS y configuracion de archivos estaticos
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

@@ -32,6 +32,7 @@ namespace mvc.Controllers
 
     // LISTAR
     // GET: /Pacientes?buscar=perez&estadoFiltro=activos&pagina=1
+    [Authorize(Roles = "Administrador,Recepcionista")]
     public async Task<IActionResult> Index(string? buscar, string? estadoFiltro, int pagina = 1)
     {
       // consulta armada pero todavia no ejecutada

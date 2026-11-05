@@ -57,7 +57,7 @@ builder.Services
         ClockSkew = TimeSpan.Zero
       };
     });
-
+// Configuracion de autorizacion
 builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
 

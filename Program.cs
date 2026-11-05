@@ -27,6 +27,7 @@ builder.Services
       options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
       options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     })
+    // Configuracion de autenticacion por cookies para la web MVC
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
       options.LoginPath = "/Account/Login";
@@ -61,7 +62,7 @@ builder.Services
 // Configuracion de autorizacion
 builder.Services.AddAntiforgery(options =>
 {
-    options.HeaderName = "RequestVerificationToken";
+  options.HeaderName = "RequestVerificationToken";
 });
 builder.Services.AddControllersWithViews();
 var app = builder.Build();

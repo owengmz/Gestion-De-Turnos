@@ -59,7 +59,10 @@ builder.Services
       };
     });
 // Configuracion de autorizacion
-builder.Services.AddAuthorization();
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
+});
 builder.Services.AddControllersWithViews();
 var app = builder.Build();
 // siembra de usuarios por rol

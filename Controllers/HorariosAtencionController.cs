@@ -89,6 +89,23 @@ namespace mvc.Controllers
             });
         }
 
+        // Endpoint para obtener la lista de profesionales activos en formato JSON
+        [HttpGet]
+        public async Task<IActionResult> ProfesionalesJson()
+        {
+            var profesionales = await _context.Profesionales
+                .Where(p => p.estado)
+                .OrderBy(p => p.apellido)
+                .Select(p => new
+                {
+                    id = p.id,
+                    nombre = p.nombre + " " + p.apellido
+                })
+                .ToListAsync();
+
+            return Json(profesionales);
+        }
+
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -96,6 +113,7 @@ namespace mvc.Controllers
             return View();
         }
 
+        // Endpoint para crear un horario mediante formulario
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(HorarioAtencion horario)
@@ -152,6 +170,54 @@ namespace mvc.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Endpoint para crear un horario mediante JSON
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CrearJson([FromBody] HorarioAtencion horario)
+        {
+            if (horario == null)
+                return BadRequest(new { mensaje = "Datos inválidos." });
+
+            if (horario.hora_hasta <= horario.hora_desde)
+                return BadRequest(new
+                {
+                    mensaje = "La hora de finalización debe ser posterior a la hora de inicio."
+                });
+
+            bool profesionalExiste = await _context.Profesionales
+                .AnyAsync(p => p.id == horario.profesional_id && p.estado);
+
+            if (!profesionalExiste)
+                return BadRequest(new { mensaje = "Debe seleccionar un profesional activo." });
+
+            bool horarioDuplicado = await _context.HorariosAtencion
+                .AnyAsync(h =>
+                    h.profesional_id == horario.profesional_id &&
+                    h.dia_semana == horario.dia_semana &&
+                    h.estado &&
+                    horario.hora_desde < h.hora_hasta &&
+                    horario.hora_hasta > h.hora_desde
+                );
+
+            if (horarioDuplicado)
+                return BadRequest(new
+                {
+                    mensaje = "El profesional ya tiene un horario que se superpone."
+                });
+
+            horario.estado = true;
+
+            _context.HorariosAtencion.Add(horario);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                mensaje = "Horario creado correctamente.",
+                id = horario.id
+            });
+        }
+        // Endpoint para editar un horario mediante formulario
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {

@@ -1,0 +1,66 @@
+{
+  "info": {
+    "name": "Gestion de Turnos - Web API JWT",
+    "description": "Hacer primero el login y pegar el token en Authorization (Bearer) de los otros requests. El login recibe form-data.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "email", "value": "admin@admin.com", "type": "text" },
+            { "key": "password", "value": "admin123", "type": "text" }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:5038/api/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5038",
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Listar profesionales",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            { "key": "token", "value": "PEGAR_TOKEN_DEL_LOGIN", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5038/api/profesionales",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5038",
+          "path": ["api", "profesionales"]
+        }
+      }
+    },
+    {
+      "name": "Profesionales sin token",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5038/api/profesionales",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5038",
+          "path": ["api", "profesionales"]
+        }
+      }
+    }
+  ]
+}

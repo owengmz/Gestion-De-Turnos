@@ -13,6 +13,7 @@ namespace mvc.Controllers;
 
 public sealed class AccountController : Controller
 {
+  // avatar y credencial se limitan a 2 MB aca cargamos el AvatarStorageService
   private const string InvalidCredentialsMessage = "Correo o contraseña incorrectos.";
   private const string ProfessionalIdClaim = "ProfesionalId";
   private const string AvatarPathClaim = "AvatarPath";

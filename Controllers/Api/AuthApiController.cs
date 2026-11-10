@@ -80,6 +80,7 @@ public class AuthApiController : ControllerBase
     });
   }
 
+  // POST: /api/auth/logout
   private string GenerarTokenJwt(Usuario usuario, out DateTime fechaExpiracion)
   {
     var jwtKey = _configuration["Jwt:Key"] ?? "ClaveSecretaSuperSeguraParaCentroMedicoTurnos2026!*";

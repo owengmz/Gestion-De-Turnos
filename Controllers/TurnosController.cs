@@ -17,6 +17,7 @@ namespace mvc.Controllers
       _context = context;
     }
 
+    // GET: /Turnos
 
     public async Task<IActionResult> Index(int pagina = 1)
     {
@@ -45,6 +46,7 @@ namespace mvc.Controllers
       return View(turnos);
     }
 
+    // GET: /Turnos/Create
     [HttpGet]
     public IActionResult Create()
     {
@@ -340,6 +342,7 @@ namespace mvc.Controllers
       return RedirectToAction(nameof(Index));
     }
 
+    // GET: /Turnos/BuscarPacientes
     [HttpGet]
     public async Task<IActionResult> BuscarPacientes(string term)
     {
@@ -364,6 +367,7 @@ namespace mvc.Controllers
     [HttpGet]
     public async Task<IActionResult> BuscarProfesionales(string term)
     {
+      //consulta la bdd
       var profesionales = await _context.Profesionales
           .AsNoTracking()
           .Where(p =>
@@ -371,7 +375,7 @@ namespace mvc.Controllers
               (p.nombre.Contains(term) ||
               p.apellido.Contains(term) ||
               p.dni.Contains(term)))
-          .OrderBy(p => p.apellido)
+          .OrderBy(p => p.apellido)           
           .Take(10)
           .Select(p => new
           {

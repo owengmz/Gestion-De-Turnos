@@ -13,9 +13,13 @@ namespace mvc.Controllers;
 
 public sealed class AccountController : Controller
 {
-  // avatar y credencial se limitan a 2 MB aca cargamos el AvatarStorageService
+  // Mensaje de error genérico para credenciales inválidas
   private const string InvalidCredentialsMessage = "Correo o contraseña incorrectos.";
+
+  // Claim que almacena el id del profesional asociado al usuario, si lo hay
   private const string ProfessionalIdClaim = "ProfesionalId";
+
+  // GET: /Account/Login
   private const string AvatarPathClaim = "AvatarPath";
 
   private readonly AppDbContext _context;
@@ -32,6 +36,7 @@ public sealed class AccountController : Controller
     _avatarStorage = avatarStorage;
   }
 
+  // GET: /Account/Login
   [HttpGet]
   [AllowAnonymous]
   public IActionResult Login(string? returnUrl = null)
@@ -42,6 +47,7 @@ public sealed class AccountController : Controller
     });
   }
 
+  // POST: /Account/Login
   [HttpPost]
   [AllowAnonymous]
   [ValidateAntiForgeryToken]
@@ -105,6 +111,7 @@ public sealed class AccountController : Controller
     return RedirectToLocal(model.ReturnUrl);
   }
 
+  // POST: /Account/Logout
   [Authorize]
   [HttpPost]
   [ValidateAntiForgeryToken]
@@ -114,6 +121,7 @@ public sealed class AccountController : Controller
     return RedirectToAction(nameof(Login));
   }
 
+  // GET: /Account/Perfil
   [Authorize]
   [HttpGet]
   public async Task<IActionResult> Perfil()
@@ -168,6 +176,7 @@ public sealed class AccountController : Controller
     return RedirectToAction(nameof(Perfil));
   }
 
+  // GET: /Account/AccessDenied
   [HttpGet]
   [AllowAnonymous]
   public IActionResult AccessDenied()

@@ -44,6 +44,7 @@ namespace mvc.Controllers
             return View(horarios);
         }
 
+        // Endpoint para obtener la lista de horarios en formato JSON
         [HttpGet]
         public async Task<IActionResult> ListarJson(int pagina = 1)
         {

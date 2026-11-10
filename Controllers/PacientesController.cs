@@ -82,6 +82,8 @@ namespace mvc.Controllers
       // un paciente nuevo ya viene activo por defecto
       return View(new Paciente());
     }
+
+    //ENDPOINT FORMULARRIO CON CREDENCIAL 
     // creamos un paciente nuevo, opcionalmente con credencial 
     // POST: /Pacientes/Crear
     [HttpPost]

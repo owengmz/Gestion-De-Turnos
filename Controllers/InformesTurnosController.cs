@@ -13,8 +13,9 @@ namespace mvc.Controllers
         public InformesTurnosController(AppDbContext context)
         {
             _context = context;
-        }
+        }     
 
+        // GET: /InformesTurnos
         public async Task<IActionResult> Index(
             DateOnly? fechaDesde,
             DateOnly? fechaHasta,

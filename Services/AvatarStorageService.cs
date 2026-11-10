@@ -13,6 +13,7 @@ public sealed class AvatarStorageService
     private const string AvatarPathPrefix = "/uploads/avatars/";
     private readonly string _avatarDirectory;
 
+    // Constructor que inicializa el servicio con el directorio de almacenamiento de avatares
     public AvatarStorageService(IWebHostEnvironment environment)
     {
         if (string.IsNullOrWhiteSpace(environment.WebRootPath))
@@ -23,6 +24,7 @@ public sealed class AvatarStorageService
         _avatarDirectory = Path.Combine(environment.WebRootPath, "uploads", "avatars");
     }
 
+    // Devuelve el mensaje de error o null si el archivo es valido
     public async Task<string?> ValidateAsync(
         IFormFile? file,
         CancellationToken cancellationToken = default)
@@ -50,6 +52,7 @@ public sealed class AvatarStorageService
             : "El contenido no coincide con una imagen JPG, PNG o WebP válida.";
     }
 
+    // Guarda el archivo y devuelve la ruta relativa del avatar
     public async Task<string> SaveAsync(
         int userId,
         IFormFile file,
@@ -92,6 +95,7 @@ public sealed class AvatarStorageService
         return AvatarPathPrefix + fileName;
     }
 
+    //
     private static async Task<byte[]> ReadHeaderAsync(
         Stream stream,
         CancellationToken cancellationToken)

@@ -18,7 +18,7 @@ namespace mvc.Controllers
         public async Task<IActionResult> Index(int pagina = 1)
         {
             int registrosPorPagina = 5;
-
+            //obtener los horarios de atencion con sus profesionales asociados
             var consulta = _context.HorariosAtencion
                 .Include(h => h.Profesional)
                 .OrderBy(h => h.profesional_id)

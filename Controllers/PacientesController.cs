@@ -172,7 +172,7 @@ namespace mvc.Controllers
     public async Task<IActionResult> Editar(
       int id,
       [Bind(CamposEditar)] Paciente paciente,
-      IFormFile? credencial,
+      IFormFile? credencial, // credencial nueva opcional
       bool quitarCredencial)
     {
       if (id != paciente.id)

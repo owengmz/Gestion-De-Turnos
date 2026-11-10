@@ -356,7 +356,7 @@ namespace mvc.Controllers
               p.apellido.Contains(term) ||
               p.dni.Contains(term))
           .OrderBy(p => p.apellido)
-          .Take(10)
+          .Take(10) //  limita a 10 resultados
           .Select(p => new
           {
             id = p.id,

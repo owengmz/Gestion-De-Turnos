@@ -19,10 +19,11 @@ namespace mvc.Controllers
 
     // GET: /Turnos
 
-    public async Task<IActionResult> Index(int pagina = 1)
+    public async Task<IActionResult> Index(int pagina = 1) // pagina actual, por defecto 1
     {
       int registrosPorPagina = 4;
 
+      // consulta para obtener los turnos e info de paciente y profesional
       var consulta = _context.Turnos
           .Include(t => t.Paciente)
           .Include(t => t.Profesional)
@@ -48,12 +49,14 @@ namespace mvc.Controllers
 
     // GET: /Turnos/Create
     [HttpGet]
+    [Authorize(Roles = "Administrador,Recepcionista")]
     public IActionResult Create()
     {
       return View();
     }
     // POST: /Turnos/Create
     [HttpPost]
+    [Authorize(Roles = "Administrador,Recepcionista")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Turno turno)
     {
@@ -365,10 +368,12 @@ namespace mvc.Controllers
     }
 
     [HttpGet]
+
+    // GET: /Turnos/BuscarProfesionales
     public async Task<IActionResult> BuscarProfesionales(string term)
     {
       //consulta la bdd
-      var profesionales = await _context.Profesionales
+      var profesionales = await _context.Profesionales //accede a la tabla profesionales
           .AsNoTracking()
           .Where(p =>
               p.estado &&
@@ -376,7 +381,7 @@ namespace mvc.Controllers
               p.apellido.Contains(term) ||
               p.dni.Contains(term)))
           .OrderBy(p => p.apellido)           
-          .Take(10)
+          .Take(10) 
           .Select(p => new
           {
             id = p.id,

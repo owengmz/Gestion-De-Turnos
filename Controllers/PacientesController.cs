@@ -105,6 +105,7 @@ namespace mvc.Controllers
       var hayCredencial = credencial is not null && credencial.Length > 0;
       if (hayCredencial)
       {
+        // validamos la credencial
         var error = await _credenciales.ValidarAsync(credencial);
         if (error is not null)
         {
@@ -123,6 +124,7 @@ namespace mvc.Controllers
       {
         if (hayCredencial)
         {
+          // guardamos la credencial y obtenemos la ruta
           ruta = await _credenciales.GuardarAsync(credencial!);
           paciente.credencial_path = ruta;
         }

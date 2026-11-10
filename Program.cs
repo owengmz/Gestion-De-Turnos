@@ -100,8 +100,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthentication(); // Habilita la autenticacion
+app.UseAuthorization();  // Habilita la autorizacion
 
 app.MapStaticAssets();
 

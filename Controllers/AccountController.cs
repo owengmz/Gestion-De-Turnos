@@ -20,7 +20,7 @@ public sealed class AccountController : Controller
   private const string ProfessionalIdClaim = "ProfesionalId";
 
   // GET: /Account/Login
-  private const string AvatarPathClaim = "AvatarPath";
+  private const string AvatarPathClaim = "AvatarPath"; //ALMACENA LA RUTA DE LA IMAGEN
 
   private readonly AppDbContext _context;
   private readonly IPasswordHasher<Usuario> _passwordHasher;
@@ -135,10 +135,11 @@ public sealed class AccountController : Controller
     return View(ToPerfilViewModel(user));
   }
 
+  // POST: /Account/Perfil
   [Authorize]
   [HttpPost]
   [ValidateAntiForgeryToken]
-  [RequestSizeLimit(2 * 1024 * 1024 + 64 * 1024)]
+  [RequestSizeLimit(2 * 1024 * 1024 + 64 * 1024)] // 2 MB + 64 KB
   public async Task<IActionResult> Perfil(PerfilViewModel model)
   {
     var user = await GetCurrentUserAsync();
@@ -154,6 +155,7 @@ public sealed class AccountController : Controller
       return View(ToPerfilViewModel(user));
     }
 
+    // Guardar la nueva imagen de perfil y actualizar la base de datos
     var previousAvatarPath = user.avatar_path;
     var newAvatarPath = await _avatarStorage.SaveAsync(user.id, model.Avatar!);
     user.avatar_path = newAvatarPath;

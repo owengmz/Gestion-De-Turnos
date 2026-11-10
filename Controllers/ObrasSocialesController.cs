@@ -25,6 +25,8 @@ namespace mvc.Controllers
     }
     // GET: /ObrasSociales/Listar?buscar=osde&pagina=1&registrosPorPagina=10
     [HttpGet]
+
+    //lista de obras sociales, paginada y filtrada por nombre
     public async Task<IActionResult> Listar(string? buscar, int pagina = 1, int registrosPorPagina = 10)
     {
       // consulta armada pero todavia no ejecutada
